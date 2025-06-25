@@ -75,7 +75,7 @@
                         <p>Farm</p>
                     </a>
                 </li>
-                @if (User.IsInRole("Owner")){
+                @if (User.IsInRole("Owner")|| User.IsInRole("Admin")){
                 <li class="nav-item">
                     <a asp-controller="FarmStaff" asp-action="Index" class="nav-link bg-pink">
                         <i class="nav-icon fas fa-users"></i>
@@ -102,7 +102,7 @@
                         <p>Medical Record</p>
                     </a>
                 </li>
-                @if ( User.IsInRole("Veterinarian"))
+                @if (User.IsInRole("Veterinarian") || User.IsInRole("Admin"))
                 {
                     <li class="nav-item">
                         <a asp-controller="Medication" asp-action="Index" class="nav-link bg-orange">
@@ -123,7 +123,7 @@
                         <p>Pregnancy</p>
                     </a>
                 </li>
-                @if (User.IsInRole("Veterinarian"))
+                @if (User.IsInRole("Veterinarian") || User.IsInRole("Admin"))
                 {
                     <li class="nav-item">
                         <a asp-controller="Vaccine" asp-action="Index" class="nav-link bg-pink">
