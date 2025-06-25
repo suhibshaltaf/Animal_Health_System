@@ -1,0 +1,139 @@
+﻿@model FarmStaffDetailsVM
+
+@section Header {
+    Farm Staff
+}
+
+@section loc {
+    Details
+}
+
+<form id="deleteForm">
+    @Html.AntiForgeryToken()
+</form>
+
+<div class="col-md-12">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h3 class="card-title">Farm Staff Details</h3>
+        </div>
+        <div class="card-body">
+            <!-- Full Name -->
+            <div class="form-group">
+                <label for="FullName">Full Name</label>
+                <input asp-for="FullName" class="form-control" id="FullName" readonly />
+            </div>
+
+            <!-- Job Title -->
+            <div class="form-group">
+                <label for="JobTitle">Job Title</label>
+                <input asp-for="JobTitle" class="form-control" id="JobTitle" readonly />
+            </div>
+
+            <!-- Phone Number -->
+            <div class="form-group">
+                <label for="PhoneNumber">Phone Number</label>
+                <input asp-for="PhoneNumber" class="form-control" id="PhoneNumber" readonly />
+            </div>
+
+            <!-- Email -->
+            <div class="form-group">
+                <label for="Email">Email</label>
+                <input asp-for="Email" class="form-control" id="Email" readonly />
+            </div>
+
+            <!-- Salary -->
+            <div class="form-group">
+                <label for="Salary">Salary</label>
+                <input asp-for="Salary" class="form-control" id="Salary" readonly />
+            </div>
+
+            <!-- Date Hired -->
+            <div class="form-group">
+                <label for="DateHired">Date Hired</label>
+                <input asp-for="DateHired" class="form-control" id="DateHired" readonly />
+            </div>
+
+            <!-- Time Worked -->
+            <div class="form-group">
+                <label for="TimeWorked">Time Worked</label>
+                <input asp-for="TimeWorked" class="form-control" id="TimeWorked" readonly />
+            </div>
+
+            <!-- Farm Name -->
+            <div class="form-group">
+                <label for="FarmName">Farm Name</label>
+                <input value="@(Model.Farm?.Name ?? "N/A")" class="form-control" id="FarmName" readonly />
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="form-group mt-4">
+                <a asp-controller="FarmStaff" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">
+                    <i class="fas fa-edit"></i> Edit
+                </a>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Index
+                </a>
+
+                <!-- Delete Button -->
+                <button type="button" class="btn btn-danger" id="deleteBtn">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section script {
+    <script>
+        document.getElementById('deleteBtn').addEventListener('click', async () => {
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: "btn btn-success",
+                    cancelButton: "btn btn-danger"
+                },
+                buttonsStyling: false
+            });
+
+            swalWithBootstrapButtons.fire({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Yes, delete it!",
+                cancelButtonText: "No, cancel!",
+                reverseButtons: true
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    const id = @Model.Id; // Getting the ID of the staff member
+
+                    // Get the anti-forgery token
+                    const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
+                    const token = tokenInput ? tokenInput.value : '';
+
+                    if (!token) {
+                        Swal.fire("Error!", "Anti-forgery token is missing.", "error");
+                        return;
+                    }
+
+                    // Send the request with the token
+                    const response = await fetch(`/Dashboard/FarmStaff/DeleteConfirmed`, {
+                        method: 'POST',
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded",
+                            "RequestVerificationToken": token
+                        },
+                        body: new URLSearchParams({ id: id }) // Sending the staff ID as form data
+                    });
+
+                    if (response.ok) {
+                        Swal.fire("Deleted!", "The staff member has been deleted.", "success");
+                        window.location.href = '/Dashboard/FarmStaff/Index'; // Redirecting after deletion
+                    } else {
+                        Swal.fire("Error!", "Unable to delete the staff member.", "error");
+                    }
+                }
+            });
+        });
+    </script>
+}

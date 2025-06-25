@@ -1,0 +1,100 @@
+﻿@model MedicationDetailsVM
+
+@section Header {
+        Medication
+}
+@section loc {
+        Details
+}
+
+<div class="col-md-12">
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3 class="card-title">Medication Details</h3>
+            <div>
+                <a asp-controller="Medication" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">
+                    <i class="fas fa-edit"></i> Edit
+                </a>
+                <button class="btn btn-danger" onclick="confirmDelete(@Model.Id)">
+                    <i class="fas fa-trash-alt"></i> Delete
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back
+                </a>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Medication Name:</label>
+                        <input class="form-control" value="@Model.Name" readonly />
+                    </div>
+                    <div class="form-group">
+                        <label>Dosage:</label>
+                        <input class="form-control" value="@Model.Dosage" readonly />
+                    </div>
+                  
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Production Date:</label>
+                        <input class="form-control" value="@Model.ProductionDate.ToString("yyyy-MM-dd")" readonly />
+                    </div>
+                    <div class="form-group">
+                        <label>Expiry Date:</label>
+                        <input class="form-control" value="@Model.ExpiryDate.ToString("yyyy-MM-dd")" readonly />
+                    </div>
+                    <div class="form-group">
+                        <label>Days Until Expiry:</label>
+                        <input class="form-control @(Model.FormattedDaysUntilExpiry == "Expired" ? "text-danger" : "text-success")"
+                               value="@Model.FormattedDaysUntilExpiry"
+                               readonly />
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Description:</label>
+                <textarea class="form-control" rows="3" readonly>@Model.Description</textarea>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Script  {
+    <script>
+        function confirmDelete(id) {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You will not be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Yes, delete it!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    deleteMedication(id);
+                }
+            });
+        }
+
+        function deleteMedication(id) {
+            $.ajax({
+                url: "/Dashboard/Medication/DeleteConfirmed/" + id,
+                type: "POST",
+                success: function (response) {
+                    Swal.fire("Deleted!", response.message, "success").then(() => {
+                        window.location.href = "/Dashboard/Medication/Index";
+                    });
+                },
+                error: function (xhr) {
+                    Swal.fire("Error!", "An error occurred while deleting.", "error");
+                }
+            });
+        }
+    </script>
+}

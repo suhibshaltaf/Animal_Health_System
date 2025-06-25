@@ -1,0 +1,86 @@
+﻿@model AnimalFormVM
+
+@section Header {
+    Edit Animal
+}
+
+@section loc {
+    edit
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<div class="col-md-12">
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h3 class="card-title">Edit Animal</h3>
+        </div>
+        <form asp-controller="Animal" asp-action="Edit" method="post">
+            <div asp-validation-summary="All" class="text-danger"></div>
+
+            <div class="card-body">
+                <input type="hidden" asp-for="Id" />
+
+                <div class="form-group">
+                    <label asp-for="Name">Name</label>
+                    <input asp-for="Name" class="form-control" placeholder="Enter animal name" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Species">Species</label>
+                    <input asp-for="Species" class="form-control" placeholder="Enter species name" />
+                    <span asp-validation-for="Species" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Breed">Breed</label>
+                    <input asp-for="Breed" class="form-control" placeholder="Enter breed" />
+                    <span asp-validation-for="Breed" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Weight"></label>
+                    <input asp-for="Weight" class="form-control" placeholder="Enter Weight" />
+                    <span asp-validation-for="Weight" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="DateOfBirth">Date of Birth</label>
+                    <input asp-for="DateOfBirth" class="form-control" type="date" />
+                    <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="FarmId">Select Farm</label>
+                    <select asp-for="FarmId" class="form-control" asp-items="Model.Farms">
+                        <option value="">Select Farm</option>
+                    </select>
+                    <span asp-validation-for="FarmId" class="text-danger"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label asp-for="Gender">Gender</label>
+                    <select asp-for="Gender" class="form-control" asp-items="@(new SelectList(Enum.GetValues(typeof(Gender))))">
+                        <option value="">Select Gender</option>
+                    </select>
+                    <span asp-validation-for="Gender" class="text-danger"></span>
+                </div>
+                <!-- Additional Notes -->
+             
+                <div class="form-group form-check">
+                    <input asp-for="IsDeleted" class="form-check-input" type="checkbox" />
+                    <label class="form-check-label" for="IsDeleted">Is Deleted</label>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary btn-block">Update Animal</button>
+                    <a asp-action="Index" class="btn btn-secondary btn-block">Cancel</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

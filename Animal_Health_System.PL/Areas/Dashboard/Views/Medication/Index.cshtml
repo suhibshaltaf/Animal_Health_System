@@ -1,0 +1,114 @@
+﻿@model IEnumerable<MedicationVM>
+
+    @section Header {
+        Medication
+    }
+    @section loc {
+        show
+    }
+
+    <div class="col-md-12">
+        <div class="card shadow-sm">
+            <div class="card-header text-center">
+                <h3 class="card-title font-weight-bold">Show All Medications</h3>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-center mb-3">
+                    <a asp-controller="Medication" asp-action="Create" class="btn btn-light btn-outline-primary">Create Medication</a>
+                </div>
+                <table class="table table-bordered table-hover">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Name</th>
+                            <th>Dosage</th>
+                            <th>Expiry Date</th>
+                            <th>Days Until Expiry</th> <!-- ✅ إضافة عدد الأيام المتبقية -->
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr id="row-@item.Id">
+                                <td>@item.Name</td>
+                                <td>@item.Dosage</td>
+                                <td>@item.ExpiryDate.ToString("yyyy-MM-dd")</td>
+                            <td class="@(item.FormattedDaysUntilExpiry == "Expired" ? "text-danger" : "text-success")">
+                                @item.FormattedDaysUntilExpiry
+                            </td>
+                                <td>
+                                    <a asp-controller="Medication" asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Edit</a>
+                                    <a asp-controller="Medication" asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">Details</a>
+                                    <button data-id="@item.Id" class="btn btn-danger btn-sm delete-btn">Delete</button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+@section script {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll(".delete-btn").forEach(button => {
+                button.addEventListener("click", async function () {
+                    const id = this.dataset.id;
+
+                    const swalWithBootstrapButtons = Swal.mixin({
+                        customClass: {
+                            confirmButton: "btn btn-success",
+                            cancelButton: "btn btn-danger"
+                        },
+                        buttonsStyling: false
+                    });
+
+                    swalWithBootstrapButtons.fire({
+                        title: "Are you sure?",
+                        text: "You won't be able to revert this!",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonText: "Yes, delete it!",
+                        cancelButtonText: "No, cancel!",
+                        reverseButtons: true
+                    }).then(async (result) => {
+                        if (result.isConfirmed) {
+                            try {
+                                const response = await fetch(`/Dashboard/Medication/DeleteConfirmed/${id}`, {
+                                    method: "POST",
+                                    headers: {
+                                        "Content-Type": "application/json"
+                                    }
+                                });
+
+                                if (!response.ok) throw new Error("Failed to delete medication.");
+
+                                const data = await response.json();
+
+                                // حذف الصف من الجدول
+                                document.getElementById(`row-${id}`).remove();
+
+                                Swal.fire({
+                                    icon: "success",
+                                    title: "Deleted successfully",
+                                    toast: true,
+                                    position: "top-end",
+                                    showConfirmButton: false,
+                                    timer: 3000
+                                });
+                            } catch (error) {
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Error",
+                                    text: "An error occurred while deleting the medication.",
+                                });
+                            }
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+}

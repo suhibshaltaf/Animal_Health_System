@@ -1,0 +1,143 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Sign Up Form - Animal Care</title>
+
+    <!-- Font Icon -->
+    <link rel="stylesheet" href="~/fonts/material-icon/css/material-design-iconic-font.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="~/Dashboard/plugins/fontawesome-free/css/all.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="~/Dashboard/dist/css/adminlte.min.css">
+    <!-- GLightbox CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css">
+
+    <!-- AOS CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+
+    <link href="//cdn.datatables.net/2.1.8/css/dataTables.dataTables.min.css" rel="stylesheet" />
+    <link href="https://cdn.datatables.net/buttons/3.1.2/css/buttons.dataTables.min.css" />
+    <link href="~/dashboard/dist/css/stylesheet.css" rel="stylesheet" />
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="~/css/style.css">
+
+    <!-- Custom CSS for page styling -->
+    <style>
+        /* Basic Layout and Form Styling */
+        body {
+            font-family: 'Arial', sans-serif;
+            padding: 0;
+            margin: 0;
+        }
+
+        .main {
+            width: 100%;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+            font-size: 30px;
+            margin-bottom: 20px;
+        }
+
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+            .alert-error ul {
+                margin: 0;
+                padding-left: 15px;
+            }
+
+            .alert-error li {
+                list-style-type: disc;
+            }
+
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .input-field {
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            transition: border-color 0.3s;
+        }
+
+            .input-field:focus {
+                border-color: #4CAF50;
+                outline: none;
+            }
+
+        .btn-submit {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+            .btn-submit:hover {
+                background-color: #45a049;
+            }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+            .form-footer a {
+                color: #4CAF50;
+                text-decoration: none;
+            }
+
+                .form-footer a:hover {
+                    text-decoration: underline;
+                }
+
+    </style>
+</head>
+<body>
+
+    <div class="main">
+        <h1>@RenderSection("Header", required: true) for Animal Care</h1>
+
+        <!-- عرض الأخطاء فوق محتوى الصفحة -->
+        <div class="alert-error" style="display: @(ViewData.ModelState.IsValid ? "none" : "block")">
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        </div>
+
+        <!-- هنا سيتم عرض محتوى الـ RenderBody() -->
+        @RenderBody()
+
+    </div>
+
+    <!-- JS -->
+    <script src="~/vendor/jquery/jquery.min.js"></script>
+    <script src="~/js/main.js"></script>
+    @RenderSection("Script", required: false)
+
+</body>
+</html>

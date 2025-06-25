@@ -1,0 +1,56 @@
+﻿@model FarmFormVM
+
+@section Header {
+    Edit Farm
+}
+
+@section loc {
+    Edit
+}
+
+<div class="col-md-12">
+    <div class="card card-primary">
+        <div class="card-header">
+            <h3 class="card-title">Edit Farm</h3>
+        </div>
+
+        <form asp-action="Edit" method="post">
+            <input type="hidden" asp-for="Id" />
+            <div asp-validation-summary="All" class="text-danger"></div>
+
+            <div class="card-body">
+                <!-- Farm Name -->
+                <div class="form-group">
+                    <label asp-for="Name">Farm Name</label>
+                    <input asp-for="Name" class="form-control" placeholder="Enter Farm Name" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <!-- Farm Location -->
+                <div class="form-group">
+                    <label asp-for="Location">Farm Location</label>
+                    <input asp-for="Location" class="form-control" placeholder="Enter Farm Location" />
+                    <span asp-validation-for="Location" class="text-danger"></span>
+                </div>
+
+                <!-- Farm Owner Selector -->
+                <div class="form-group">
+                    <label asp-for="OwnerId">Select Farm Owner</label>
+                    <select asp-for="OwnerId" class="form-control" asp-items="Model.Owners">
+                        <option value="">Select an Owner</option>
+                    </select>
+                    <span asp-validation-for="OwnerId" class="text-danger"></span>
+                </div>
+
+                <!-- Farm Status -->
+               
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="card-footer">
+                <button type="submit" class="btn btn-primary">Update</button>
+                <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>

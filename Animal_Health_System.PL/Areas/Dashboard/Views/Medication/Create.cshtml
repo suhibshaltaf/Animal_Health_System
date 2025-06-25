@@ -1,0 +1,61 @@
+﻿@model MedicationFormVM
+
+@section Header {
+        Medication
+}
+
+@section loc {
+        Create
+}
+
+<div class="col-md-12">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h3 class="card-title">Create Medication</h3>
+        </div>
+        <form asp-controller="Medication" asp-action="Create" method="post">
+            <div class="card-body">
+                <!-- عرض جميع الأخطاء -->
+                <div class="alert alert-danger" asp-validation-summary="ModelOnly"></div>
+
+                <div class="form-group">
+                    <label asp-for="Name">Name</label>
+                    <input asp-for="Name" class="form-control" placeholder="Enter Medication Name" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Dosage">Dosage</label>
+                    <input asp-for="Dosage" class="form-control" placeholder="Enter Medication Dosage" />
+                    <span asp-validation-for="Dosage" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Description">Description</label>
+                    <input asp-for="Description" class="form-control" placeholder="Enter Medication Description" />
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+              
+
+                <div class="form-group">
+                    <label asp-for="ProductionDate">Production Date</label>
+                    <input asp-for="ProductionDate" class="form-control" type="date" />
+                    <span asp-validation-for="ProductionDate" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="ExpiryDate">Expiry Date</label>
+                    <input asp-for="ExpiryDate" class="form-control" type="date" />
+                    <span asp-validation-for="ExpiryDate" class="text-danger"></span>
+                </div>
+
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success btn-block">Create Medication</button>
+                    <a asp-action="Index" class="btn btn-secondary btn-block">Cancel</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

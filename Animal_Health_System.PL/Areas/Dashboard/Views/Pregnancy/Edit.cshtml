@@ -1,0 +1,108 @@
+﻿@model PregnancyFormVM
+
+@section Header {
+        Edit Pregnancy Record
+}
+
+@section loc {
+        edit-pregnancy
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<div class="col-md-12">
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h3 class="card-title">Edit Pregnancy Record</h3>
+        </div>
+        <form asp-controller="Pregnancy" asp-action="Edit" method="post">
+            <div asp-validation-summary="All" class="text-danger"></div>
+
+            <div class="card-body">
+                <input type="hidden" asp-for="Id" />
+
+                <!-- Name -->
+                <div class="form-group">
+                    <label asp-for="Name">Pregnancy Name</label>
+                    <input asp-for="Name" class="form-control" placeholder="Enter pregnancy name" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <!-- Mating Date -->
+                <div class="form-group">
+                    <label asp-for="MatingDate">Mating Date</label>
+                    <input asp-for="MatingDate" class="form-control" type="date" />
+                    <span asp-validation-for="MatingDate" class="text-danger"></span>
+                </div>
+
+                <!-- Expected Birth Date -->
+                <div class="form-group">
+                    <label asp-for="ExpectedBirthDate">Expected Birth Date</label>
+                    <input asp-for="ExpectedBirthDate" class="form-control" type="date" />
+                    <span asp-validation-for="ExpectedBirthDate" class="text-danger"></span>
+                </div>
+
+                <!-- Actual Birth Date -->
+                <div class="form-group">
+                    <label asp-for="ActualBirthDate">Actual Birth Date</label>
+                    <input asp-for="ActualBirthDate" class="form-control" type="date" />
+                    <span asp-validation-for="ActualBirthDate" class="text-danger"></span>
+                </div>
+
+                <!-- Pregnancy Status -->
+                <div class="form-group">
+                    <label asp-for="Status">Pregnancy Status</label>
+                    <select asp-for="Status" class="form-control" asp-items="Html.GetEnumSelectList<PregnancyStatus>()">
+                        <option value="">Select Status</option>
+                    </select>
+                    <span asp-validation-for="Status" class="text-danger"></span>
+                </div>
+
+                <!-- Complications -->
+                <div class="form-group form-check">
+                    <input asp-for="HasComplications" class="form-check-input" type="checkbox" />
+                    <label class="form-check-label" asp-for="HasComplications">Has Complications</label>
+                </div>
+
+                <!-- Notes -->
+                <div class="form-group">
+                    <label asp-for="Notes">Notes</label>
+                    <textarea asp-for="Notes" class="form-control" placeholder="Enter any notes"></textarea>
+                    <span asp-validation-for="Notes" class="text-danger"></span>
+                </div>
+
+                <!-- Number of Loads -->
+              
+
+                <!-- Animal Selection -->
+                <div class="form-group">
+                    <label asp-for="AnimalId">Select Animal</label>
+                    <select asp-for="AnimalId" class="form-control" asp-items="Model.Animals">
+                        <option value="">Select Animal</option>
+                    </select>
+                    <span asp-validation-for="AnimalId" class="text-danger"></span>
+                </div>
+
+                <!-- Mating Selection -->
+                <div class="form-group">
+                    <label asp-for="MatingId">Select Mating</label>
+                    <select asp-for="MatingId" class="form-control" asp-items="Model.Matings">
+                        <option value="">Select Mating</option>
+                    </select>
+                    <span asp-validation-for="MatingId" class="text-danger"></span>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary btn-block">Update Pregnancy</button>
+                    <a asp-action="Index" class="btn btn-secondary btn-block">Cancel</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

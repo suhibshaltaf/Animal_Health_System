@@ -1,0 +1,48 @@
+﻿@model OwnerFormVM
+
+@section Header {
+    Owner
+}
+
+@section loc {
+    Create
+}
+
+@{
+    var successMessage = TempData["SuccessMessage"];
+    var errorMessage = TempData["ErrorMessage"];
+}
+
+<div class="col-md-8 offset-md-2">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h3 class="card-title text-center">Create Owner</h3>
+        </div>
+        <form asp-controller="Owner" asp-action="Create" method="post">
+            <div class="card-body">
+                <div class="form-group">
+                    <label asp-for="FullName" class="font-weight-bold"></label>
+                    <input asp-for="FullName" class="form-control" placeholder="Enter full name" />
+                    <span asp-validation-for="FullName" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="PhoneNumber" class="font-weight-bold"></label>
+                    <input asp-for="PhoneNumber" class="form-control" placeholder="Enter phone number" />
+                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Email" class="font-weight-bold"></label>
+                    <input asp-for="Email" class="form-control" placeholder="Enter email" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+            </div>
+            <div class="card-footer text-right">
+                <button type="submit" class="btn btn-primary">Save</button>
+                <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>

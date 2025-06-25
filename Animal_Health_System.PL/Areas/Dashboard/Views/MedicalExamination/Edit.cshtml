@@ -1,0 +1,190 @@
+﻿@model MedicalExaminationFormVM
+
+@section Header {
+        Edit Medical Examination
+}
+
+@section loc {
+        edit
+}
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Success"]
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["Error"]
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+
+<div class="col-md-12">
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h3 class="card-title">Edit Medical Examination</h3>
+        </div>
+        <form asp-controller="MedicalExamination" asp-action="Edit" method="post">
+            <div class="card-body">
+              
+
+                <input type="hidden" asp-for="Id" />
+
+                <div class="form-group">
+                    <label>Name</label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label>Diagnosis</label>
+                    <input asp-for="Diagnosis" class="form-control" />
+                    <span asp-validation-for="Diagnosis" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label>Examination Type</label>
+                    <input asp-for="ExaminationType" class="form-control" />
+                    <span asp-validation-for="ExaminationType" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label>Examination Date</label>
+                    <input asp-for="ExaminationDate" class="form-control" type="datetime-local" />
+                    <span asp-validation-for="ExaminationDate" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label>Treatment</label>
+                    <input asp-for="Treatment" class="form-control" />
+                    <span asp-validation-for="Treatment" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label>Farm</label>
+                    <select id="FarmId" asp-for="FarmId" class="form-control" asp-items="Model.Farm" onchange="updateAnimalsList()">
+                        <option value="">Select Farm</option>
+                    </select>
+                    <span asp-validation-for="FarmId" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label>Animal</label>
+                    <select id="AnimalId" asp-for="AnimalId" class="form-control" onchange="checkMedicalRecord()">
+                        <option value="">Select Animal</option>
+                    </select>
+                    <span asp-validation-for="AnimalId" class="text-danger"></span>
+                    <div id="medicalRecordMessage" class="text-danger" style="display:none;"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>Medical Record</label>
+                    <select id="MedicalRecordId" asp-for="MedicalRecordId" class="form-control" disabled></select>
+                    <span asp-validation-for="MedicalRecordId" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label>Veterinarian</label>
+                    <select asp-for="VeterinarianId" asp-items="Model.Veterinarian" class="form-control">
+                        <option value="">Select Veterinarian</option>
+                    </select>
+                    <span asp-validation-for="VeterinarianId" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label>Medications</label>
+                    <select asp-for="SelectedMedications" class="form-control" asp-items="Model.MedicationsList" multiple></select>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success btn-block">Save Changes</button>
+                    <a asp-action="Index" class="btn btn-secondary btn-block">Cancel</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section script {
+    <script>
+            function updateAnimalsList() {
+            var farmId = $("#FarmId").val();
+            if (farmId) {
+                $.ajax({
+                    url: '@Url.Action("GetAnimalsByFarm", "MedicalExamination")',
+                    type: 'GET',
+                    data: { farmId: farmId },
+                    success: function (data) {
+                        console.log("Animals Data:", data); // ✅ تتبع البيانات القادمة من السيرفر
+
+                        var animalSelect = $("#AnimalId");
+                        animalSelect.empty().append('<option value="">Select Animal</option>');
+
+                        if (data && data.length > 0) {
+                            $.each(data, function (index, animal) {
+                                if (animal && animal.value && animal.text) {
+                                    animalSelect.append('<option value="' + animal.value + '">' + animal.text + '</option>');
+                                } else {
+                                    console.error("Invalid animal data:", animal); // ❌ بيانات غير صحيحة
+                                }
+                            });
+
+                            // تحديد الحيوان المخزن مسبقًا
+                            var selectedAnimalId = '@Model.AnimalId';
+                            if (selectedAnimalId) {
+                                $("#AnimalId").val(selectedAnimalId);
+                            }
+                        } else {
+                            console.warn("No animals found for this farm.");
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error fetching animals:", status, error);
+                        alert("An error occurred while fetching animals.");
+                    }
+                });
+            } else {
+                $("#AnimalId").empty().append('<option value="">Select Animal</option>');
+            }
+        }
+
+        $(document).ready(function () {
+            updateAnimalsList();
+        });
+
+
+        function checkMedicalRecord() {
+            var animalId = $('#AnimalId').val();
+            if (animalId) {
+                $.get('@Url.Action("CheckMedicalRecord", "MedicalExamination")', { animalId: animalId })
+                    .done(function (response) {
+                        if (response.hasMedicalRecord) {
+                            $('#MedicalRecordId')
+                                .empty()
+                                .append('<option value="' + response.medicalRecordId + '">' + response.medicalRecordName + '</option>')
+                                .prop('disabled', false);
+                            $('#medicalRecordMessage')
+                                .text('The animal has a medical record: ' + response.medicalRecordName)
+                                .show();
+                        } else {
+                            $('#MedicalRecordId').empty().append('<option value="">No medical record</option>').prop('disabled', true);
+                            $('#medicalRecordMessage').text("This animal does not have a medical record.").show();
+                        }
+                    })
+                    .fail(function () {
+                        console.error("Error fetching medical record");
+                    });
+            } else {
+                $('#MedicalRecordId').empty().append('<option value="">Select Medical Record</option>').prop('disabled', true);
+                $('#medicalRecordMessage').hide();
+            }
+        }
+    </script>
+}

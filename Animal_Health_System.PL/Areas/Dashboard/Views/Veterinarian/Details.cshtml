@@ -1,0 +1,117 @@
+﻿@model VeterinarianDetailsVM
+
+@section Header {
+Veterinarian
+}
+
+@section loc {
+Details
+}
+
+@{
+    var successMessage = TempData["SuccessMessage"];
+    var errorMessage = TempData["ErrorMessage"];
+}
+<form id="deleteForm">
+    @Html.AntiForgeryToken()
+</form>
+
+<div class="col-md-10 offset-md-2">
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h3 class="card-title">Veterinarian Details</h3>
+        </div>
+        <div class="card-body">
+            @if (successMessage != null)
+            {
+                <div class="alert alert-success">@successMessage</div>
+            }
+
+            @if (errorMessage != null)
+            {
+                <div class="alert alert-danger">@errorMessage</div>
+            }
+
+            <ul class="list-group">
+                <li class="list-group-item">Name: @Model.FullName</li>
+                <li class="list-group-item">Phone Number: @Model.PhoneNumber</li>
+                <li class="list-group-item">Email: @Model.Email</li>
+                <li class="list-group-item">Specialty: @Model.Specialty</li>
+                <li class="list-group-item">Years of Experience: @Model.YearsOfExperience</li>
+                <li class="list-group-item">Created At: @(Model.CreatedAt.ToString("MMMM dd, yyyy") ?? "N/A")</li>
+            </ul>
+
+            <div class="form-group mt-4">
+                @if (User.IsInRole("Veterinarian"))
+                {
+                    <a asp-controller="Veterinarian" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>}
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Index
+                </a>
+
+                @if (User.IsInRole("Veterinarian"))
+                {
+                    <button class="btn btn-danger" id="deleteBtn">
+                        <i class="fas fa-trash"></i> Delete
+                </button>}
+            </div>
+        </div>
+    </div>
+</div>
+
+@section script {
+    <script>
+              document.getElementById('deleteBtn').addEventListener('click', async () => {
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: "btn btn-success",
+                    cancelButton: "btn btn-danger"
+                },
+                buttonsStyling: false
+            });
+
+            swalWithBootstrapButtons.fire({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Yes, delete it!",
+                cancelButtonText: "No, cancel!",
+                reverseButtons: true
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    const id = @Model.Id; // الحصول على ID الطبيب البيطري
+
+                    // ✅ جلب التوكن من الفورم المخفي
+                    const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
+                    const token = tokenInput ? tokenInput.value : '';
+
+                    if (!token) {
+                        Swal.fire("Error!", "Anti-forgery token is missing.", "error");
+                        return;
+                    }
+
+                    // ✅ إرسال الطلب مع التوكن
+                    const response = await fetch(`/Dashboard/Veterinarian/DeleteConfirmed`, {
+                        method: 'POST',
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded",
+                            "RequestVerificationToken": token
+                        },
+                        body: new URLSearchParams({ id: id }) // إرسال ID كـ FormData
+                    });
+
+                    if (response.ok) {
+                        Swal.fire("Deleted!", "The veterinarian has been deleted.", "success");
+                        window.location.href = '/Dashboard/Veterinarian/Index'; // توجيه المستخدم بعد الحذف
+                    } else {
+                        Swal.fire("Error!", "Unable to delete the veterinarian.", "error");
+                    }
+                }
+            });
+        });
+
+    </script>
+}

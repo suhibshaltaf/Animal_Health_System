@@ -1,0 +1,130 @@
+﻿@model BirthDetailsVM
+
+@section Header {
+        Birth Details
+}
+
+@section loc {
+        show
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<div class="col-md-12">
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h3 class="card-title">Birth Details</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <!-- Birth ID -->
+                <div class="col-md-6 form-group">
+                    <label for="Id">Birth ID</label>
+                    <input asp-for="Name" class="form-control" id="Id" readonly />
+                </div>
+
+                <!-- Pregnancy ID -->
+                <div class="col-md-6 form-group">
+                    <label for="PregnancyId">Pregnancy ID</label>
+                    <input asp-for="Pregnancy.Name" class="form-control" id="PregnancyId" readonly />
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Birth Date -->
+                <div class="col-md-6 form-group">
+                    <label for="BirthDate">Birth Date</label>
+                    <input asp-for="BirthDate" class="form-control" id="BirthDate" readonly />
+                </div>
+
+                <!-- Number of Offspring -->
+                <div class="col-md-6 form-group">
+                    <label for="NumberOfOffspring">Number of Offspring</label>
+                    <input asp-for="NumberOfOffspring" class="form-control" id="NumberOfOffspring" readonly />
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Birth Condition -->
+                <div class="col-md-6 form-group">
+                    <label for="BirthCondition">Birth Condition</label>
+                    <input asp-for="BirthCondition" class="form-control" id="BirthCondition" readonly />
+                </div>
+            </div>
+
+            <div class="form-group mt-4">
+                <a asp-controller="Birth" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">
+                    <i class="fas fa-edit"></i> Edit
+                </a>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Index
+                </a>
+                <form asp-controller="Birth" asp-action="DeleteConfirmed" asp-route-id="@Model.Id" method="post" class="d-inline delete-form">
+                    @Html.AntiForgeryToken()
+                    <button type="button" class="btn btn-danger btn-sm delete-btn" data-id="@Model.Id">
+                        <i class="fas fa-trash-alt"></i> Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section script {
+    <script>
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', async () => {
+                const swalWithBootstrapButtons = Swal.mixin({
+                    customClass: {
+                        confirmButton: "btn btn-success",
+                        cancelButton: "btn btn-danger"
+                    },
+                    buttonsStyling: false
+                });
+
+                swalWithBootstrapButtons.fire({
+                    title: "Are you sure?",
+                    text: "You won't be able to revert this!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Yes, delete it!",
+                    cancelButtonText: "No, cancel!",
+                    reverseButtons: true
+                }).then(async (result) => {
+                    if (result.isConfirmed) {
+                        const id = button.getAttribute("data-id"); // جلب ID من الزر
+                        const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
+                        const token = tokenInput ? tokenInput.value : '';
+
+                        if (!token) {
+                            Swal.fire("Error!", "Anti-forgery token is missing.", "error");
+                            return;
+                        }
+
+                        // إرسال الطلب
+                        const response = await fetch(`/Dashboard/Birth/DeleteConfirmed`, {
+                            method: 'POST',
+                            headers: {
+                                "Content-Type": "application/x-www-form-urlencoded",
+                                "RequestVerificationToken": token
+                            },
+                            body: new URLSearchParams({ id: id })
+                        });
+
+                        if (response.ok) {
+                            Swal.fire("Deleted!", "The birth record has been deleted.", "success")
+                                .then(() => window.location.href = '/Dashboard/Birth/Index');
+                        } else {
+                            Swal.fire("Error!", "Unable to delete the birth record.", "error");
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+}

@@ -1,0 +1,74 @@
+﻿@model VeterinarianFormVM
+
+@section Header {
+   Veterinarian 
+}
+
+@section loc {
+    Create 
+}
+@{
+    var successMessage = TempData["SuccessMessage"];
+    var errorMessage = TempData["ErrorMessage"];
+
+
+    if (successMessage != null)
+    {
+        <div class="alert alert-success">@successMessage</div>
+    }
+
+    if (errorMessage != null)
+    {
+        <div class="alert alert-danger">@errorMessage</div>
+    }
+}
+
+<div class="col-md-8 offset-md-2">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h3 class="card-title text-center">Create Veterinarian</h3>
+        </div>
+        <form asp-controller="Veterinarian" asp-action="Create" method="post">
+            <div class="card-body">
+                @* Full Name *@
+                <div class="form-group">
+                    <label asp-for="FullName" class="font-weight-bold"></label>
+                    <input asp-for="FullName" class="form-control" placeholder="Enter full name" />
+                    <span asp-validation-for="FullName" class="text-danger"></span>
+                </div>
+
+                @* Specialty *@
+                <div class="form-group">
+                    <label asp-for="Specialty" class="font-weight-bold"></label>
+                    <input asp-for="Specialty" class="form-control" placeholder="Enter specialty" />
+                    <span asp-validation-for="Specialty" class="text-danger"></span>
+                </div>
+
+                @* Phone Number *@
+                <div class="form-group">
+                    <label asp-for="PhoneNumber" class="font-weight-bold"></label>
+                    <input asp-for="PhoneNumber" class="form-control" placeholder="Enter phone number" />
+                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                </div>
+
+                @* Email *@
+                <div class="form-group">
+                    <label asp-for="Email" class="font-weight-bold"></label>
+                    <input asp-for="Email" class="form-control" placeholder="Enter email" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                @* Years of Experience *@
+                <div class="form-group">
+                    <label asp-for="YearsOfExperience" class="font-weight-bold"></label>
+                    <input asp-for="YearsOfExperience" class="form-control" type="number" placeholder="Enter years of experience" />
+                    <span asp-validation-for="YearsOfExperience" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="card-footer text-right">
+                <button type="submit" class="btn btn-primary">Save</button>
+                <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>

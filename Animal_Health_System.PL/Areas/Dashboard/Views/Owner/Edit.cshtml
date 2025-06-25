@@ -1,0 +1,65 @@
+﻿@model OwnerFormVM
+
+@section Header {
+    Edit Owner
+}
+
+@section loc {
+    Edit
+}
+
+@{
+    var successMessage = TempData["SuccessMessage"];
+    var errorMessage = TempData["ErrorMessage"];
+}
+
+<div class="col-md-12">
+    @if (successMessage != null)
+    {
+        <div class="alert alert-success">@successMessage</div>
+    }
+
+    @if (errorMessage != null)
+    {
+        <div class="alert alert-danger">@errorMessage</div>
+    }
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h3 class="card-title">Edit Owner</h3>
+        </div>
+        <form asp-controller="Owner" asp-action="Edit" method="post">
+            <div class="card-body">
+                <input type="hidden" asp-for="Id" />
+                <div asp-validation-summary="All" class="text-danger"></div>
+
+                <!-- Full Name -->
+                <div class="form-group">
+                    <label asp-for="FullName">Full Name</label>
+                    <input asp-for="FullName" class="form-control" placeholder="Enter Owner Full Name" />
+                    <span asp-validation-for="FullName" class="text-danger"></span>
+                </div>
+
+                <!-- Phone Number -->
+                <div class="form-group">
+                    <label asp-for="PhoneNumber">Phone Number</label>
+                    <input asp-for="PhoneNumber" class="form-control" placeholder="Enter Owner Phone Number" />
+                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                </div>
+
+                <!-- Email -->
+                <div class="form-group">
+                    <label asp-for="Email">Email</label>
+                    <input asp-for="Email" class="form-control" placeholder="Enter Owner Email" readonly/>
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+            </div>
+
+            <div class="card-footer">
+                <button type="submit" class="btn btn-success btn-block">Save Changes</button>
+                <a asp-action="Index" class="btn btn-secondary btn-block">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>

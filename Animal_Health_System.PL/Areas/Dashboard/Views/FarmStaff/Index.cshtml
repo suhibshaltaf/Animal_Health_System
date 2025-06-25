@@ -1,0 +1,116 @@
+﻿@model IEnumerable<FarmStaffVM>
+
+@section Header {
+    Farm Staff
+}
+
+@section loc {
+    index
+}
+
+<form id="deleteForm">
+    @Html.AntiForgeryToken()
+</form>
+
+<div class="col-md-12">
+    <div class="card shadow-sm">
+        <div class="card-header text-center bg-primary text-white">
+            <h3 class="card-title font-weight-bold">Show All Farm Staff</h3>
+        </div>
+        <div class="card-body">
+            @if (User.IsInRole("Admin"))
+            {
+
+
+            <div class="d-flex justify-content-center mb-3">
+                <a asp-controller="FarmStaff" asp-action="Create" class="btn btn-light btn-outline-primary">Add New Staff</a>
+                </div>
+            }
+            <table class="table table-bordered table-hover">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Full Name</th>
+                        <th>Job Title</th>
+                        <th>Phone Number</th>
+                        <th>Email</th>
+                        <th>Farm Name</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                            <tr>
+                                <td>@item.FullName</td>
+                                <td>@item.JobTitle</td>
+                                <td>@item.PhoneNumber</td>
+                                <td>@item.Email</td>
+                                <td>@(item.Farm.Name ?? "N/A")</td>
+                                <td>
+                                    <a asp-controller="FarmStaff" asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Edit</a>
+                                    <a asp-controller="FarmStaff" asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">Details</a>
+                                    <a href="javascript:void(0)" data-id="@item.Id" class="btn btn-danger btn-sm delete-btn">Delete</a>
+                                </td>
+                            </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section script {
+        <script>
+            document.querySelectorAll('.delete-btn').forEach(button => {
+                button.addEventListener('click', async () => {
+                    const swalWithBootstrapButtons = Swal.mixin({
+                        customClass: {
+                            confirmButton: "btn btn-success",
+                            cancelButton: "btn btn-danger"
+                        },
+                        buttonsStyling: false
+                    });
+
+                    swalWithBootstrapButtons.fire({
+                        title: "Are you sure?",
+                        text: "You won't be able to revert this!",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonText: "Yes, delete it!",
+                        cancelButtonText: "No, cancel!",
+                        reverseButtons: true
+                    }).then(async (result) => {
+                        if (result.isConfirmed) {
+                            const id = button.dataset.id;
+
+                            // Get the anti-forgery token from the form
+                            const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
+                            const token = tokenInput ? tokenInput.value : '';
+
+                            if (!token) {
+                                Swal.fire("Error!", "Anti-forgery token is missing.", "error");
+                                return;
+                            }
+
+                            // Send the delete request with the token
+                            const response = await fetch(`/Dashboard/FarmStaff/DeleteConfirmed`, {
+                                method: 'POST',
+                                headers: {
+                                    "Content-Type": "application/x-www-form-urlencoded",
+                                    "RequestVerificationToken": token
+                                },
+                                body: new URLSearchParams({ id: id })
+                            });
+
+                            if (response.ok) {
+                                Swal.fire("Deleted!", "The staff member has been deleted.", "success");
+                                button.closest("tr").remove();
+                            } else {
+                                Swal.fire("Error!", "Unable to delete the staff member.", "error");
+                            }
+                        }
+                    });
+                });
+            });
+        </script>
+}

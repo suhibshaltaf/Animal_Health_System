@@ -1,0 +1,137 @@
+﻿@model Animal_Health_System.PL.Areas.Dashboard.ViewModels.MatingVIMO.MatingFormVM
+
+@section Header {
+        Edit Mating
+}
+
+@section loc {
+        show
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<div class="col-md-12">
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h3 class="card-title">Edit Mating</h3>
+        </div>
+        <form asp-controller="Mating" asp-action="Edit" method="post">
+            <div asp-validation-summary="All" class="text-danger"></div>
+
+            <div class="card-body">
+                <input type="hidden" asp-for="Id" />
+
+                <!-- Name -->
+                <div class="form-group">
+                    <label asp-for="Name">Name</label>
+                    <input asp-for="Name" class="form-control" placeholder="Enter mating name" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <!-- Mating Date -->
+                <div class="form-group">
+                    <label asp-for="MatingDate">Mating Date</label>
+                    <input asp-for="MatingDate" class="form-control" type="datetime-local" />
+                    <span asp-validation-for="MatingDate" class="text-danger"></span>
+                </div>
+
+                <!-- Notes -->
+                <div class="form-group">
+                    <label asp-for="Notes">Notes</label>
+                    <textarea asp-for="Notes" class="form-control" placeholder="Enter notes"></textarea>
+                    <span asp-validation-for="Notes" class="text-danger"></span>
+                </div>
+
+                <!-- Farm -->
+                <div class="form-group">
+                    <label asp-for="FarmId">Select Farm</label>
+                    <select asp-for="FarmId" class="form-control" id="FarmId" asp-items="Model.Farms">
+                        <option value="">Select Farm</option>
+                    </select>
+                    <span asp-validation-for="FarmId" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="MaleAnimalId">Select Male Animal</label>
+                    <select asp-for="MaleAnimalId" class="form-control" id="MaleAnimalId">
+                        <option value="">Select Male Animal</option>
+                        @if (Model.MaleAnimals != null)
+                        {
+                            foreach (var male in Model.MaleAnimals)
+                            {
+                                <option value="@male.Value">@male.Text</option>
+                            }
+                        }
+                    </select>
+                    <span asp-validation-for="MaleAnimalId" class="text-danger"></span>
+                </div>
+
+                <!-- Female Animal -->
+                <div class="form-group">
+                    <label asp-for="FemaleAnimalId">Select Female Animal</label>
+                    <select asp-for="FemaleAnimalId" class="form-control" id="FemaleAnimalId">
+                        <option value="">Select Female Animal</option>
+                        @if (Model.FemaleAnimals != null)
+                        {
+                            foreach (var female in Model.FemaleAnimals)
+                            {
+                                <option value="@female.Value">@female.Text</option>
+                            }
+                        }
+                    </select>
+                    <span asp-validation-for="FemaleAnimalId" class="text-danger"></span>
+                </div>
+                <div class="form-group form-check">
+                    <input asp-for="Ispregnancyevent" class="form-check-input" type="checkbox" />
+                    <label class="form-check-label" asp-for="Ispregnancyevent"></label>
+                    <span asp-validation-for="Ispregnancyevent" class="text-danger"></span>
+                </div>
+
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary btn-block">Update</button>
+                    <a asp-action="Index" class="btn btn-secondary btn-block">Cancel</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Script {
+    <script>
+        function updateAnimalsList() {
+            var farmId = $("#FarmId").val();
+            if (farmId && farmId !== "") {
+                $.ajax({
+                    url: '@Url.Action("GetAnimalsByFarm", "Mating")',
+                    type: 'GET',
+                    data: { farmId: farmId },
+                    success: function (data) {
+                        var maleAnimalSelect = $("#MaleAnimalId");
+                        var femaleAnimalSelect = $("#FemaleAnimalId");
+                        maleAnimalSelect.empty().append('<option value="">Select Male Animal</option>');
+                        femaleAnimalSelect.empty().append('<option value="">Select Female Animal</option>');
+
+                        data.maleAnimals.forEach(function (animal) {
+                            maleAnimalSelect.append('<option value="' + animal.id + '">' + animal.name + '</option>');
+                        });
+                        data.femaleAnimals.forEach(function (animal) {
+                            femaleAnimalSelect.append('<option value="' + animal.id + '">' + animal.name + '</option>');
+                        });
+                    }
+                });
+            }
+        }
+
+        $(document).ready(function () {
+            $("#FarmId").change(function () {
+                updateAnimalsList();
+            });
+        });
+    </script>
+}

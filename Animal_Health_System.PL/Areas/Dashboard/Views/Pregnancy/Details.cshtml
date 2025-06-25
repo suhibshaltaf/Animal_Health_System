@@ -1,0 +1,162 @@
+﻿@model Animal_Health_System.PL.Areas.Dashboard.ViewModels.PregnancyVIMO.PregnancyDetailsVM
+
+@section Header {
+        Pregnancy Details
+}
+
+@section loc {
+        show
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<div class="col-md-12">
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h3 class="card-title">Pregnancy Details</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <!-- Name -->
+                <div class="col-md-6 form-group">
+                    <label for="Name">Name</label>
+                    <input asp-for="Name" class="form-control" id="Name" readonly />
+                </div>
+
+                <!-- Mating Date -->
+                <div class="col-md-6 form-group">
+                    <label for="MatingDate">Mating Date</label>
+                    <input asp-for="MatingDate" class="form-control" id="MatingDate" readonly />
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Expected Birth Date -->
+                <div class="col-md-6 form-group">
+                    <label for="ExpectedBirthDate">Expected Birth Date</label>
+                    <input asp-for="ExpectedBirthDate" class="form-control" id="ExpectedBirthDate" readonly />
+                </div>
+
+                <!-- Actual Birth Date -->
+                <div class="col-md-6 form-group">
+                    <label for="ActualBirthDate">Actual Birth Date</label>
+                    <input asp-for="ActualBirthDate" class="form-control" id="ActualBirthDate" readonly />
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Status -->
+                <div class="col-md-6 form-group">
+                    <label for="Status">Pregnancy Status</label>
+                    <input asp-for="Status" class="form-control" id="Status" readonly />
+                </div>
+
+                <!-- Complications -->
+                <div class="col-md-6 form-group">
+                    <label for="HasComplications">Complications</label>
+                    <input asp-for="HasComplications" class="form-control" id="HasComplications" readonly />
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Number of Loads -->
+                
+                <!-- Notes -->
+                <div class="col-md-6 form-group">
+                    <label for="Notes">Notes</label>
+                    <input asp-for="Notes" class="form-control" id="Notes" readonly />
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Animal Info -->
+                <div class="col-md-6 form-group">
+                    <label for="AnimalName">Animal</label>
+                    <input asp-for="Animal.Name" class="form-control" id="AnimalName" readonly />
+                </div>
+
+                <!-- Mating Details -->
+                <div class="col-md-6 form-group">
+                    <label for="MatingDetails">Mating Details</label>
+                    <input asp-for="mating.MatingDate" class="form-control" id="MatingDetails" readonly />
+                </div>
+            </div>
+
+            <div class="form-group mt-4">
+                <a asp-controller="Pregnancy" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">
+                    <i class="fas fa-edit"></i> Edit
+                </a>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Index
+                </a>
+                <form asp-controller="Pregnancy" asp-action="DeleteConfirmed" asp-route-id="@Model.Id" method="post" class="d-inline delete-form">
+                    @Html.AntiForgeryToken()
+                    <button type="button" class="btn btn-danger btn-sm delete-btn" data-id="@Model.Id">
+                        <i class="fas fa-trash-alt"></i> Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section script {
+    <script>
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', async () => {
+                const swalWithBootstrapButtons = Swal.mixin({
+                    customClass: {
+                        confirmButton: "btn btn-success",
+                        cancelButton: "btn btn-danger"
+                    },
+                    buttonsStyling: false
+                });
+
+                swalWithBootstrapButtons.fire({
+                    title: "Are you sure?",
+                    text: "You won't be able to revert this!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Yes, delete it!",
+                    cancelButtonText: "No, cancel!",
+                    reverseButtons: true
+                }).then(async (result) => {
+                    if (result.isConfirmed) {
+                        const id = button.getAttribute("data-id"); // Get ID from the button
+
+                        // Get Anti-forgery token
+                        const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
+                        const token = tokenInput ? tokenInput.value : '';
+
+                        if (!token) {
+                            Swal.fire("Error!", "Anti-forgery token is missing.", "error");
+                            return;
+                        }
+
+                        // Send request
+                        const response = await fetch(`/Dashboard/Pregnancy/DeleteConfirmed`, {
+                            method: 'POST',
+                            headers: {
+                                "Content-Type": "application/x-www-form-urlencoded",
+                                "RequestVerificationToken": token
+                            },
+                            body: new URLSearchParams({ id: id })
+                        });
+
+                        if (response.ok) {
+                            Swal.fire("Deleted!", "The pregnancy has been deleted.", "success")
+                                .then(() => window.location.href = '/Dashboard/Pregnancy/Index'); // Redirect after delete
+                        } else {
+                            Swal.fire("Error!", "Unable to delete the pregnancy.", "error");
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+}

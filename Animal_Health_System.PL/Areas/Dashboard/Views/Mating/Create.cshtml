@@ -1,0 +1,122 @@
+﻿@model Animal_Health_System.PL.Areas.Dashboard.ViewModels.MatingVIMO.MatingFormVM
+
+@section Header {
+        Create Mating
+}
+
+@section loc {
+        show
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<div class="col-md-12">
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h3 class="card-title">Create Mating</h3>
+        </div>
+        <form asp-controller="Mating" asp-action="Create" method="post">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="card-body">
+                <!-- Farm Selection -->
+                <div class="form-group">
+                    <label asp-for="FarmId">Farm</label>
+                    <select asp-for="FarmId" class="form-control" id="FarmId">
+                        <option value="">Select Farm</option>
+                        @foreach (var farm in Model.Farms)
+                        {
+                            <option value="@farm.Value">@farm.Text</option>
+                        }
+                    </select>
+                    <span asp-validation-for="FarmId" class="text-danger"></span>
+                </div>
+
+                <!-- Animal Selection -->
+                <div class="form-group">
+                    <label asp-for="MaleAnimalId">Male Animal</label>
+                    <select asp-for="MaleAnimalId" class="form-control" id="MaleAnimalId">
+                        <option value="">Select Male Animal</option>
+                    </select>
+                    <span asp-validation-for="MaleAnimalId" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="FemaleAnimalId">Female Animal</label>
+                    <select asp-for="FemaleAnimalId" class="form-control" id="FemaleAnimalId">
+                        <option value="">Select Female Animal</option>
+                    </select>
+                    <span asp-validation-for="FemaleAnimalId" class="text-danger"></span>
+                </div>
+
+                <!-- Mating Date -->
+                <div class="form-group">
+                    <label asp-for="MatingDate">Mating Date</label>
+                    <input asp-for="MatingDate" class="form-control" type="date" />
+                    <span asp-validation-for="MatingDate" class="text-danger"></span>
+                </div>
+
+                <!-- Notes -->
+                <div class="form-group">
+                    <label asp-for="Notes">Notes</label>
+                    <textarea asp-for="Notes" class="form-control" rows="3"></textarea>
+                    <span asp-validation-for="Notes" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Name">Name</label>
+                    <textarea asp-for="Name" class="form-control" rows="3"></textarea>
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+                <!-- Submit Button -->
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary btn-block">Create</button>
+                    <a asp-action="Index" class="btn btn-secondary btn-block">Cancel</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Script {
+    <script>
+        $(document).ready(function () {
+            // Fetch animals when the farm changes
+            $("#FarmId").change(function () {
+                var farmId = $(this).val();
+                if (farmId) {
+                    $.ajax({
+                        url: '@Url.Action("GetAnimalsByFarm", "Mating")',
+                        type: 'GET',
+                        data: { farmId: farmId },
+                        success: function (data) {
+                            var maleAnimalSelect = $("#MaleAnimalId");
+                            var femaleAnimalSelect = $("#FemaleAnimalId");
+
+                            maleAnimalSelect.empty().append('<option value="">Select Male Animal</option>');
+                            femaleAnimalSelect.empty().append('<option value="">Select Female Animal</option>');
+
+                            // Add male animals to the MaleAnimalId dropdown
+                            $.each(data.males, function (index, animal) {
+                                maleAnimalSelect.append('<option value="' + animal.value + '">' + animal.text + '</option>');
+                            });
+
+                            // Add female animals to the FemaleAnimalId dropdown
+                            $.each(data.females, function (index, animal) {
+                                femaleAnimalSelect.append('<option value="' + animal.value + '">' + animal.text + '</option>');
+                            });
+                        },
+                        error: function () {
+                            alert("Error fetching animals.");
+                        }
+                    });
+                } else {
+                    $("#MaleAnimalId, #FemaleAnimalId").empty().append('<option value="">Select Animal</option>');
+                }
+            });
+        });
+    </script>
+}

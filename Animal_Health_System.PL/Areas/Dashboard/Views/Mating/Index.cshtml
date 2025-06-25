@@ -1,0 +1,137 @@
+﻿@model IEnumerable<MatingVM>
+
+@section Header {
+        Mating History
+}
+
+@section loc {
+        show
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<div class="col-md-12">
+    <div class="card shadow-sm">
+        <div class="card-header text-center">
+            <h3 class="card-title font-weight-bold">Show All Matings</h3>
+        </div>
+        <div class="card-body">
+            <!-- Create Mating Button -->
+            <div class="d-flex justify-content-center mb-3">
+                <a asp-controller="Mating" asp-action="Create" class="btn btn-light btn-outline-primary">
+                    <i class="fas fa-plus"></i> Create New Mating
+                </a>
+            </div>
+
+            @if (Model == null || !Model.Any())
+            {
+                <div class="alert alert-warning text-center" role="alert">
+                    No mating records available.
+                </div>
+            }
+            else
+            {
+                <!-- Mating Table -->
+                <table class="table table-bordered table-hover">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Farm Name</th>
+                            <th>Mating Date</th>
+                            <th>Notes</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.Farm?.Name </td> <!-- عرض اسم المزرعة أو "No Farm" في حال كانت فارغة -->
+                                <td>@item.MatingDate.ToString("yyyy-MM-dd")</td>
+                                <td>@item.Notes</td>
+                                <td class="text-center">
+                                    <!-- Edit Button -->
+                                    <a asp-controller="Mating" asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+
+                                    <!-- Details Button -->
+                                    <a asp-controller="Mating" asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">
+                                        <i class="fas fa-info-circle"></i> Details
+                                    </a>
+
+                                    <!-- Delete Button -->
+                                    <form asp-controller="Mating" asp-action="DeleteConfirmed" asp-route-id="@item.Id" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-danger btn-sm">
+                                            <i class="fas fa-trash-alt"></i> Delete
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+</div>
+
+@section script {
+    <script>
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', async () => {
+                const swalWithBootstrapButtons = Swal.mixin({
+                    customClass: {
+                        confirmButton: "btn btn-success",
+                        cancelButton: "btn btn-danger"
+                    },
+                    buttonsStyling: false
+                });
+
+                swalWithBootstrapButtons.fire({
+                    title: "Are you sure?",
+                    text: "You won't be able to revert this!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Yes, delete it!",
+                    cancelButtonText: "No, cancel!",
+                    reverseButtons: true
+                }).then(async (result) => {
+                    if (result.isConfirmed) {
+                        const id = button.getAttribute("data-id"); // جلب ID من الزر
+
+                        // جلب التوكين المضاد للهجمات CSRF
+                        const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
+                        const token = tokenInput ? tokenInput.value : '';
+
+                        if (!token) {
+                            Swal.fire("Error!", "Anti-forgery token is missing.", "error");
+                            return;
+                        }
+
+                        // إرسال الطلب
+                        const response = await fetch(`/Dashboard/Mating/DeleteConfirmed/${id}`, {
+                            method: 'POST',
+                            headers: {
+                                "Content-Type": "application/x-www-form-urlencoded",
+                                "RequestVerificationToken": token
+                            }
+                        });
+
+                        if (response.ok) {
+                            Swal.fire("Deleted!", "The Mating has been deleted.", "success")
+                                .then(() => window.location.href = '/Dashboard/Mating/Index'); // إعادة التوجيه بعد الحذف
+                        } else {
+                            Swal.fire("Error!", "Unable to delete the Mating.", "error");
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+}

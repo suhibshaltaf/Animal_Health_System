@@ -1,0 +1,67 @@
+﻿@model VaccineFormVM
+
+@section Header {
+        Vaccine
+}
+
+@section loc {
+        edit
+}
+
+@{
+    var successMessage = TempData["SuccessMessage"];
+    var errorMessage = TempData["ErrorMessage"];
+}
+
+@if (successMessage != null)
+{
+    <div class="alert alert-success">@successMessage</div>
+}
+
+@if (errorMessage != null)
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+
+<div class="col-md-12">
+    <div class="card card-primary">
+        <div class="card-header">
+            <h3 class="card-title">Edit Vaccine</h3>
+        </div>
+        <form asp-controller="Vaccine" asp-action="Edit" method="post">
+            <div class="card-body">
+                <input type="hidden" asp-for="Id" />
+                <div class="form-group">
+                    <label asp-for="Name">Vaccine Name</label>
+                    <input asp-for="Name" class="form-control" placeholder="Enter Vaccine Name" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Dose">Dose</label>
+                    <input asp-for="Dose" class="form-control" placeholder="Enter Dose" />
+                    <span asp-validation-for="Dose" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Description">Description</label>
+                    <input asp-for="Description" class="form-control" placeholder="Enter Medication Description" />
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="ProductionDate">Production Date</label>
+                    <input asp-for="ProductionDate" type="date" class="form-control" />
+                    <span asp-validation-for="ProductionDate" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="ExpiryDate">Expiry Date</label>
+                    <input asp-for="ExpiryDate" type="date" class="form-control" />
+                    <span asp-validation-for="ExpiryDate" class="text-danger"></span>
+                </div>
+              
+            </div>
+            <div class="card-footer">
+                <button type="submit" class="btn btn-primary">Update</button>
+                <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>

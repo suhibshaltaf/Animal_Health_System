@@ -1,0 +1,51 @@
+﻿@{
+    ViewData["Title"] = "emailconf";
+    Layout = "~/Views/Shared/_AuthLayout.cshtml";
+}
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f9f9f9;
+        padding: 0;
+        margin: 0;
+    }
+
+    .dd {
+        text-align: center;
+        padding: 50px 20px;
+    }
+
+        .dd h1 {
+            font-size: 50px;
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+
+        .dd h3 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .dd a {
+            font-size: 30px;
+            color: #FFD700; /* Yellow color */
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+            .dd a:hover {
+                color: #FFA500; /* Darker yellow on hover */
+            }
+</style>
+@section Header {
+Email Confirmation
+}
+<div class="dd">
+    <h1>Email Confirmation</h1>
+    <h3>
+        Please check your email for the confirmation link. <br>
+        If you haven't received the email, <a href="https://accounts.google.com/v3/signin/identifier?continue=https%3A%2F%2Fmail.google.com%2Fmail%2Fu%2F0%2F&emr=1&followup=https%3A%2F%2Fmail.google.com%2Fmail%2Fu%2F0%2F&ifkv=ARpgrqe4xNXzOrsFtPQwM_1mw4N4ybj8Cp5TWLNmIdyhvQc1yV_mWdyyHoOSgRd2YiKISDRNpxWo&osid=1&passive=1209600&service=mail&flowName=GlifWebSignIn&flowEntry=ServiceLogin&dsh=S-802951319%3A1729586355109366&ddm=0" target="_blank">go to your email</a>
+    </h3>
+</div>

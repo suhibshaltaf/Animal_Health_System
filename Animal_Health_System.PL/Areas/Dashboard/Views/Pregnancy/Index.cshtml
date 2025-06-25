@@ -1,0 +1,144 @@
+﻿@model IEnumerable<PregnancyVM>
+
+@section Header {
+        Pregnancy List
+}
+
+@section loc {
+        index
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<div class="col-md-12">
+    <div class="card shadow-sm">
+        <div class="card-header text-center">
+            <h3 class="card-title font-weight-bold">Show All Pregnancies</h3>
+        </div>
+        <div class="card-body">
+            <!-- Create Pregnancy Button -->
+            <div class="d-flex justify-content-center mb-3">
+                <a asp-controller="Pregnancy" asp-action="Create" class="btn btn-light btn-outline-primary">
+                    <i class="fas fa-plus"></i> Create New Pregnancy
+                </a>
+            </div>
+
+            @if (Model == null || !Model.Any())
+            {
+                <div class="alert alert-warning text-center" role="alert">
+                    No pregnancy records available.
+                </div>
+            }
+            else
+            {
+                <!-- Pregnancy Table -->
+                <table class="table table-bordered table-hover">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Name</th>
+                            <th>Expected Birth Date</th>
+                            <th>Status</th>
+                            <th>Pregnancy Duration</th>
+                            <th>Time to Birth</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.Name</td>
+                                <td>@item.ExpectedBirthDate.ToShortDateString()</td>
+                                <td>@item.Status</td>
+                                <td>@item.PregnancyDurationText</td>
+                                <td>@item.TimeToBirthText</td>
+                                <td class="text-center">
+                                    <!-- Edit Button -->
+                                    <a asp-controller="Pregnancy" asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+
+                                    <!-- Details Button -->
+                                    <a asp-controller="Pregnancy" asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">
+                                        <i class="fas fa-info-circle"></i> Details
+                                    </a>
+
+                                    <!-- Delete Button -->
+                                    <form asp-controller="Pregnancy" asp-action="DeleteConfirmed" asp-route-id="@item.Id" method="post" class="d-inline delete-form">
+                                        @Html.AntiForgeryToken()
+                                        <button type="button" class="btn btn-danger btn-sm delete-btn" data-id="@item.Id">
+                                            <i class="fas fa-trash-alt"></i> Delete
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+</div>
+
+@section script {
+    <script>
+        document.querySelectorAll(".delete-btn").forEach(button => {
+            button.addEventListener("click", async () => {
+                const swalWithBootstrapButtons = Swal.mixin({
+                    customClass: {
+                        confirmButton: "btn btn-success",
+                        cancelButton: "btn btn-danger"
+                    },
+                    buttonsStyling: false
+                });
+
+                swalWithBootstrapButtons.fire({
+                    title: "Are you sure?",
+                    text: "You won't be able to revert this!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Yes, delete it!",
+                    cancelButtonText: "No, cancel!",
+                    reverseButtons: true
+                }).then(async (result) => {
+                    if (result.isConfirmed) {
+                        const id = button.dataset.id;
+                        const form = button.closest(".delete-form");
+                        const csrfToken = form.querySelector("input[name='__RequestVerificationToken']").value;
+
+                        const response = await fetch(`/Dashboard/Pregnancy/DeleteConfirmed/${id}`, {
+                            method: 'POST',
+                            headers: {
+                                "Content-Type": "application/json",
+                                "RequestVerificationToken": csrfToken
+                            }
+                        });
+
+                        if (response.ok) {
+                            button.closest("tr").remove();
+                            Swal.fire({
+                                icon: "success",
+                                title: "Deleted successfully",
+                                toast: true,
+                                position: "top-end",
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Error",
+                                text: "Failed to delete the pregnancy."
+                            });
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+}

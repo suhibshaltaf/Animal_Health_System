@@ -1,0 +1,183 @@
+﻿@model VaccineHistoryFormVM
+
+@section Header {
+        Edit Vaccine History
+}
+
+@section loc {
+        show
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<div class="col-md-12">
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h3 class="card-title">Edit Vaccine History</h3>
+        </div>
+        <form asp-controller="VaccineHistory" asp-action="Edit" method="post">
+            <div asp-validation-summary="All" class="text-danger"></div>
+
+            <div class="card-body">
+                <input type="hidden" asp-for="Id" />
+
+                <!-- Name -->
+                <div class="form-group">
+                    <label asp-for="Name">Name</label>
+                    <input asp-for="Name" class="form-control" placeholder="Enter vaccine history name" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <!-- Administration Date -->
+                <div class="form-group">
+                    <label asp-for="AdministrationDate">Administration Date</label>
+                    <input asp-for="AdministrationDate" class="form-control" type="datetime-local" />
+                    <span asp-validation-for="AdministrationDate" class="text-danger"></span>
+                </div>
+
+                <!-- Veterinarian -->
+                <div class="form-group">
+                    <label asp-for="VeterinarianId">Select Veterinarian</label>
+                    <select asp-for="VeterinarianId" class="form-control" asp-items="Model.Veterinarians">
+                        <option value="">Select Veterinarian</option>
+                    </select>
+                    <span asp-validation-for="VeterinarianId" class="text-danger"></span>
+                </div>
+
+                <!-- Vaccine -->
+                <div class="form-group">
+                    <label asp-for="VaccineId">Select Vaccine</label>
+                    <select asp-for="VaccineId" class="form-control" asp-items="Model.Vaccines">
+                        <option value="">Select Vaccine</option>
+                    </select>
+                    <span asp-validation-for="VaccineId" class="text-danger"></span>
+                </div>
+
+                <!-- Farm -->
+                <div class="form-group">
+                    <label asp-for="FarmId">Select Farm</label>
+                    <select asp-for="FarmId" class="form-control" id="FarmId" asp-items="Model.Farms">
+                        <option value="">Select Farm</option>
+                    </select>
+                    <span asp-validation-for="FarmId" class="text-danger"></span>
+                </div>
+
+                <!-- Animal -->
+                <div class="form-group">
+                    <label asp-for="AnimalId">Select Animal</label>
+                    <select asp-for="AnimalId" class="form-control" id="AnimalId">
+                        <option value="">-- Select Animal --</option>
+                    </select>
+                    <span asp-validation-for="AnimalId" class="text-danger"></span>
+                </div>
+
+                <!-- Medical Record -->
+                <div class="form-group">
+                    <label asp-for="MedicalRecordId">Select Medical Record</label>
+                    <select asp-for="MedicalRecordId" class="form-control" id="MedicalRecordId">
+                        <option value="">-- Select Medical Record --</option>
+                    </select>
+                    <span asp-validation-for="MedicalRecordId" class="text-danger"></span>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary btn-block">Update</button>
+                    <a asp-action="Index" class="btn btn-secondary btn-block">Cancel</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Script {
+    <script>
+        function updateAnimalsList() {
+            var farmId = $("#FarmId").val();
+            if (farmId) {
+                $.ajax({
+                    url: '@Url.Action("GetAnimalsByFarm", "VaccineHistory")',
+                    type: 'GET',
+                    data: { farmId: farmId },
+                    success: function (data) {
+                        console.log("Animals Data:", data); // ✅ Check the animals data
+
+                        var animalSelect = $("#AnimalId");
+                        animalSelect.empty().append('<option value="">Select Animal</option>');
+
+                        if (data && data.length > 0) {
+                            $.each(data, function (index, animal) {
+                                if (animal && animal.value && animal.text) {
+                                    animalSelect.append('<option value="' + animal.value + '">' + animal.text + '</option>');
+                                } else {
+                                    console.error("Invalid animal data:", animal); // ❌ Invalid animal data
+                                }
+                            });
+
+                            // Select previously selected animal
+                            var selectedAnimalId = '@Model.AnimalId';
+                            if (selectedAnimalId) {
+                                $("#AnimalId").val(selectedAnimalId);
+                            }
+                        } else {
+                            console.warn("No animals found for this farm.");
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error fetching animals:", status, error);
+                        alert("An error occurred while fetching animals.");
+                    }
+                });
+            } else {
+                $("#AnimalId").empty().append('<option value="">Select Animal</option>');
+            }
+        }
+
+        $(document).ready(function () {
+            updateAnimalsList();
+
+            // Watch farm dropdown change and update animals list accordingly
+            $('#FarmId').change(function() {
+                updateAnimalsList();
+                checkMedicalRecord(); // Check medical record for selected animal
+            });
+
+            // Watch animal dropdown change and check medical record
+            $('#AnimalId').change(function() {
+                checkMedicalRecord();
+            });
+        });
+
+        function checkMedicalRecord() {
+            var animalId = $('#AnimalId').val();
+            if (animalId) {
+                $.get('@Url.Action("CheckMedicalRecord", "VaccineHistory")', { animalId: animalId })
+                    .done(function (response) {
+                        if (response.hasMedicalRecord) {
+                            $('#MedicalRecordId')
+                                .empty()
+                                .append('<option value="' + response.medicalRecordId + '">' + response.medicalRecordName + '</option>')
+                                .prop('disabled', false);
+                            $('#medicalRecordMessage')
+                                .text('The animal has a medical record: ' + response.medicalRecordName)
+                                .show();
+                        } else {
+                            $('#MedicalRecordId').empty().append('<option value="">No medical record</option>').prop('disabled', true);
+                            $('#medicalRecordMessage').text("This animal does not have a medical record.").show();
+                        }
+                    })
+                    .fail(function () {
+                        console.error("Error fetching medical record");
+                    });
+            } else {
+                $('#MedicalRecordId').empty().append('<option value="">Select Medical Record</option>').prop('disabled', true);
+                $('#medicalRecordMessage').hide();
+            }
+        }
+    </script>
+}

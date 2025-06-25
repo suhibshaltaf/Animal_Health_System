@@ -1,0 +1,51 @@
+﻿@model FarmFormVM
+
+@section Header {
+    Create Farm
+}
+
+@section loc {
+    create
+}
+
+<div class="col-md-12">
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h3 class="card-title">Create Farm</h3>
+        </div>
+        <form asp-controller="Farm" asp-action="Create" method="post">
+            <div class="card-body">
+                <div asp-validation-summary="All" class="text-danger"></div>
+
+                <!-- Farm Name -->
+                <div class="form-group">
+                    <label asp-for="Name">Name</label>
+                    <input asp-for="Name" class="form-control" placeholder="Enter Farm Name" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <!-- Farm Location -->
+                <div class="form-group">
+                    <label asp-for="Location">Location</label>
+                    <input asp-for="Location" class="form-control" placeholder="Enter Farm Location" />
+                    <span asp-validation-for="Location" class="text-danger"></span>
+                </div>
+
+                <!-- Farm Owner Selector -->
+                <div class="form-group">
+                    <label asp-for="OwnerId">Select Owner</label>
+                    <select asp-for="OwnerId" class="form-control" asp-items="Model.Owners">
+                        <option value="">Select an Owner</option>
+                    </select>
+                    <span asp-validation-for="OwnerId" class="text-danger"></span>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary btn-block">Create Farm</button>
+                    <a asp-action="Index" class="btn btn-secondary btn-block">Cancel</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,93 @@
+﻿@model MedicalExaminationDetailsVM
+@section Header {
+        Medical Examination
+}
+@section loc {
+        Details
+}
+
+<div class="col-md-12">
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h3 class="card-title">Medical Examination Details</h3>
+        </div>
+        <div class="card-body">
+            <!-- Diagnosis -->
+            <div class="form-group row">
+                <label for="Diagnosis" class="col-sm-3 col-form-label">Diagnosis</label>
+                <div class="col-sm-9">
+                    <input asp-for="Diagnosis" class="form-control" id="Diagnosis" readonly />
+                </div>
+            </div>
+
+            <!-- Treatment -->
+            <div class="form-group row">
+                <label for="Treatment" class="col-sm-3 col-form-label">Treatment</label>
+                <div class="col-sm-9">
+                    <input asp-for="Treatment" class="form-control" id="Treatment" readonly />
+                </div>
+            </div>
+
+            <!-- Medical Record -->
+            <div class="form-group row">
+                <label for="MedicalRecordId" class="col-sm-3 col-form-label">Medical Record</label>
+                <div class="col-sm-9">
+                    <input class="form-control" value="@(Model.MedicalRecord?.Name ?? "No medical record available")" readonly />
+                </div>
+            </div>
+
+            <!-- Animal Information -->
+            <div class="form-group row">
+                <label for="AnimalName" class="col-sm-3 col-form-label">Animal</label>
+                <div class="col-sm-9">
+                    <input class="form-control" value="@(Model.Animal?.Name ?? "No animal information available")" readonly />
+                </div>
+            </div>
+
+            <!-- Medications -->
+            <div class="form-group row">
+                <!-- Veterinarian Information
+
+                <label for="Medications" class="col-sm-3 col-form-label">Medications</label>
+                <div class="col-sm-9">
+                    if (Model.Medications != null && Model.Medications.Any())
+                    {
+                        <ul class="list-group">
+                            foreach (var medication in Model.Medications)
+                            {
+                                <li class="list-group-item">medication.Name</li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p>No medications prescribed.</p>
+                    }
+                </div> -->
+            </div>
+
+            <!-- Veterinarian Information -->
+            <div class="form-group row">
+
+                <label for="VeterinarianName" class="col-sm-3 col-form-label">Veterinarian</label>
+                <div class="col-sm-9">
+                    <input class="form-control" value="@(Model.Veterinarian?.FullName ?? "No veterinarian information available")" readonly />
+                </div>
+            </div>
+
+            <!-- Buttons: Edit & Back -->
+            <div class="form-group mt-4">
+                @if ( User.IsInRole("Veterinarian"))
+                { 
+
+                <a asp-controller="MedicalExamination" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>
+                }
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Index
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

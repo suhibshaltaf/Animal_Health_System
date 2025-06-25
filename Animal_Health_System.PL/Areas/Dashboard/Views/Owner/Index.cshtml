@@ -1,0 +1,142 @@
+﻿@model IEnumerable<OwnerVM>
+
+@section Header {
+Owner
+}
+
+@section loc {
+Show All
+}
+
+@{
+    var successMessage = TempData["SuccessMessage"];
+    var errorMessage = TempData["ErrorMessage"];
+}
+
+<form id="deleteForm">
+    @Html.AntiForgeryToken()
+</form>
+
+<div class="col-md-12">
+    @if (successMessage != null)
+    {
+        <div class="alert alert-success">@successMessage</div>
+    }
+
+    @if (errorMessage != null)
+    {
+        <div class="alert alert-danger">@errorMessage</div>
+    }
+
+    <div class="card shadow-sm">
+        <div class="card-header text-center">
+
+            <h3 class="card-title font-weight-bold">Show All Owners</h3>
+        </div>
+
+        <div class="card-body">
+            @if (User.IsInRole("Admin"))
+            {
+                <div class="d-flex justify-content-center mb-3">
+                    <a asp-controller="Owner" asp-action="Create" class="btn btn-light btn-outline-primary">Create New Owner</a>
+            </div>}
+            <table class="table table-bordered table-hover">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Name</th>
+                        <th>Phone Number</th>
+                        <th>Email</th>
+
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var owner in Model)
+                    {
+                        <tr>
+                            <td>@owner.FullName</td>
+                            <td>@owner.PhoneNumber</td>
+                            <td>@owner.Email</td>
+
+                            <td>
+                                <a asp-controller="Owner" asp-action="Edit" asp-route-id="@owner.Id" class="btn btn-warning btn-sm">Edit</a>
+                                <a asp-controller="Owner" asp-action="Details" asp-route-id="@owner.Id" class="btn btn-info btn-sm">Details</a>
+                                <a href="javascript:void(0)" data-id="@owner.Id" class="btn btn-danger btn-sm delete-btn">Delete</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section script {
+    <script>
+        // Check if DataTable is already initialized before initializing again
+        const tableElement = document.querySelector('#table');
+        if (!$.fn.DataTable.isDataTable(tableElement)) {
+            new DataTable(tableElement, {
+                layout: {
+                    topStart: {
+                        buttons: [
+                            'copy', 'excel', 'pdf'
+                        ]
+                    }
+                }
+            });
+        }
+
+        // Handling delete button click event
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', async () => {
+                const swalWithBootstrapButtons = Swal.mixin({
+                    customClass: {
+                        confirmButton: "btn btn-success",
+                        cancelButton: "btn btn-danger"
+                    },
+                    buttonsStyling: false
+                });
+
+                swalWithBootstrapButtons.fire({
+                    title: "Are you sure?",
+                    text: "You won't be able to revert this!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Yes, delete it!",
+                    cancelButtonText: "No, cancel!",
+                    reverseButtons: true
+                }).then(async (result) => {
+                    if (result.isConfirmed) {
+                        const id = button.dataset.id;
+
+                        // Get the anti-forgery token from the form
+                        const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
+                        const token = tokenInput ? tokenInput.value : '';
+
+                        if (!token) {
+                            Swal.fire("Error!", "Anti-forgery token is missing.", "error");
+                            return;
+                        }
+
+                        const response = await fetch(`/Dashboard/Owner/DeleteConfirmed`, {
+                            method: 'POST',
+                            headers: {
+                                "Content-Type": "application/json",
+                                "RequestVerificationToken": token
+                            },
+                            body: JSON.stringify({ id: id }) // Sending data as JSON
+                        });
+
+                        if (response.ok) {
+                            Swal.fire("Deleted!", "The owner has been deleted.", "success");
+                            button.closest("tr").remove();
+                        } else {
+                            Swal.fire("Error!", "Unable to delete the owner.", "error");
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+}

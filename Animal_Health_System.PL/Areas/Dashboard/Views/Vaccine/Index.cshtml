@@ -1,0 +1,121 @@
+﻿@model IEnumerable<VaccineVM>
+
+@section Header {
+        Vaccine
+}
+
+@section loc {
+        show
+}
+
+@{
+    var successMessage = TempData["SuccessMessage"];
+    var errorMessage = TempData["ErrorMessage"];
+}
+
+@if (successMessage != null)
+{
+    <div class="alert alert-success">@successMessage</div>
+}
+
+@if (errorMessage != null)
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+
+<div class="col-md-12">
+    <div class="card shadow-sm">
+        <div class="card-header text-center">
+            <h3 class="card-title font-weight-bold">Show All Vaccines</h3>
+        </div>
+        <div class="card-body">
+            <div class="d-flex justify-content-center mb-3">
+                <a asp-controller="Vaccine" asp-action="Create" class="btn btn-light btn-outline-primary">Create Vaccine</a>
+            </div>
+            <table class="table table-bordered table-hover">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Name</th>
+                        <th>Dose</th>
+                        <th>Expiry Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Name</td>
+                            <td>@item.Dose</td>
+                            <td>@item.FormattedDaysUntilExpiry</td>
+                            <td>
+                                <a asp-controller="Vaccine" asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Edit</a>
+                                <a asp-controller="Vaccine" asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">Details</a>
+                                <a href="javascript:void(0)" data-id="@item.Id" class="btn btn-danger btn-sm delete-btn">Delete</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Script  {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const deleteButtons = document.querySelectorAll(".delete-btn");
+            deleteButtons.forEach(function (button) {
+                button.addEventListener("click", function () {
+                    const vaccineId = button.getAttribute("data-id");
+
+                    Swal.fire({
+                        title: "Are you sure?",
+                        text: "You won't be able to revert this!",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonText: "Yes, delete it!",
+                        cancelButtonText: "No, cancel!",
+                        reverseButtons: true
+                    }).then(async (result) => {
+                        if (result.isConfirmed) {
+                            try {
+                                const response = await fetch(`/Dashboard/Vaccine/DeleteConfirmed/${vaccineId}`, {
+                                    method: 'POST',
+                                    headers: {
+                                        "Content-Type": "application/json"
+                                    }
+                                });
+
+                                if (response.ok) {
+                                    // Remove the row from the table
+                                    button.closest("tr").remove();
+
+                                    // Show success message
+                                    Swal.fire({
+                                        toast: true,
+                                        position: "top-end",
+                                        showConfirmButton: false,
+                                        timer: 3000,
+                                        timerProgressBar: true,
+                                        icon: "success",
+                                        title: "Vaccine deleted successfully"
+                                    });
+                                } else {
+                                    throw new Error("Failed to delete vaccine");
+                                }
+                            } catch (error) {
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Error",
+                                    text: "An error occurred while deleting the vaccine."
+                                });
+                            }
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+}

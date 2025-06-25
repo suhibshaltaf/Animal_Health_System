@@ -1,0 +1,89 @@
+﻿@model BirthFormVM
+
+@section Header {
+            Edit Birth
+}
+@section loc{
+    asdasd
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+<div class="col-md-12">
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h3 class="card-title">Edit Birth</h3>
+        </div>
+        <form asp-controller="Birth" asp-action="Edit" method="post">
+            <div asp-validation-summary="All" class="text-danger"></div>
+
+            <div class="card-body">
+                <input type="hidden" asp-for="Id" />
+
+                <!-- Name -->
+                <div class="form-group">
+                    <label asp-for="Name">Birth Name</label>
+                    <input asp-for="Name" class="form-control" placeholder="Enter birth name" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <!-- Birth Date -->
+                <div class="form-group">
+                    <label asp-for="BirthDate">Birth Date</label>
+                    <input asp-for="BirthDate" class="form-control" type="date" />
+                    <span asp-validation-for="BirthDate" class="text-danger"></span>
+                </div>
+
+                <!-- Number of Offspring -->
+                <div class="form-group">
+                    <label asp-for="NumberOfOffspring">Number of Offspring</label>
+                    <input asp-for="NumberOfOffspring" class="form-control" type="number" min="1" max="20" />
+                    <span asp-validation-for="NumberOfOffspring" class="text-danger"></span>
+                </div>
+
+                <!-- Birth Condition -->
+                <div class="form-group">
+                    <label asp-for="BirthCondition">Birth Condition</label>
+                    <textarea asp-for="BirthCondition" class="form-control" placeholder="Describe birth condition"></textarea>
+                    <span asp-validation-for="BirthCondition" class="text-danger"></span>
+                </div>
+
+                <!-- Pregnancy Selection -->
+                <div class="form-group">
+                    <label asp-for="PregnancyId">Select Pregnancy</label>
+                    <select asp-for="PregnancyId" class="form-control" asp-items="Model.Pregnancy">
+                        <option value="">Select Pregnancy</option>
+                    </select>
+                    <span asp-validation-for="PregnancyId" class="text-danger"></span>
+                </div>
+
+                <!-- Animal Selection -->
+                <div class="form-group">
+                    <label asp-for="AnimalId">Select Animal</label>
+                    <select asp-for="AnimalId" class="form-control" asp-items="Model.Animal">
+                        <option value="">Select Animal</option>
+                    </select>
+                    <span asp-validation-for="AnimalId" class="text-danger"></span>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary btn-block">Update Birth</button>
+                    <a asp-action="Index" class="btn btn-secondary btn-block">Cancel</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

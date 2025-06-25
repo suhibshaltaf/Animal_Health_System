@@ -1,0 +1,211 @@
+﻿@model MedicalRecordDetailsVM
+
+@section Header {
+Medical Record Details
+}
+
+@section loc {
+Details
+}
+
+<div class="col-md-12">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h3 class="card-title">Medical Record Details</h3>
+        </div>
+        <div class="card-body">
+            <!-- Diagnosis -->
+            <div class="form-group">
+                <label for="Name" class="font-weight-bold">Diagnosis</label>
+                <input asp-for="Name" class="form-control" id="Name" readonly />
+            </div>
+
+            <!-- Animal Name -->
+            <div class="form-group">
+                <label for="Animal" class="font-weight-bold">Animal</label>
+                <input asp-for="Animal.Name" class="form-control" id="Animal" readonly />
+            </div>
+
+            <!-- Farm Name -->
+            <div class="form-group">
+                <label for="Farm" class="font-weight-bold">Farm</label>
+                <input asp-for="Animal.Farm.Name" class="form-control" id="Farm" readonly />
+            </div>
+
+            <!-- Created At -->
+            <div class="form-group">
+                <label for="CreatedAt" class="font-weight-bold">Created At</label>
+                <input asp-for="CreatedAt" class="form-control" id="CreatedAt" readonly />
+            </div>
+
+            <!-- Vaccines -->
+            <div class="form-group">
+                <label for="Vaccines" class="font-weight-bold">Vaccines</label>
+                @if (Model.vaccineHistories != null && Model.vaccineHistories.Any())
+                {
+                    @for (int i = 0; i < Model.vaccineHistories.Count; i++)
+                    {
+                        var vaccine = Model.vaccineHistories.ElementAt(i);
+                        <div class="mb-3 p-3 border rounded bg-light">
+                            <strong class="text-primary">@Ordinal(i + 1) Vaccine:</strong>
+                            <div><strong>Name:</strong> @vaccine.Name</div>
+                            <div><strong>Administration Date:</strong> @vaccine.AdministrationDate.ToString("yyyy-MM-dd")</div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <span>No vaccines assigned</span>
+                }
+            </div>
+
+            <!-- Examinations -->
+            <div class="form-group">
+                <label for="Examinations" class="font-weight-bold">Examinations</label>
+                @if (Model.Examinations != null && Model.Examinations.Any())
+                {
+                    @for (int i = 0; i < Model.Examinations.Count; i++)
+                    {
+                        var exam = Model.Examinations.ElementAt(i);
+                        <div class="mb-3 p-3 border rounded bg-light">
+                            <strong class="text-primary">@Ordinal(i + 1) Examination:</strong>
+                            <div><strong>Examination Date:</strong> @exam.ExaminationDate.ToString("yyyy-MM-dd")</div>
+                            <div><strong>Diagnosis:</strong> @exam.Diagnosis</div>
+                            <div><strong>Treatment:</strong> @exam.Treatment</div>
+                            <div>
+                                <!-- Veterinarian Information
+                                <strong>Medications:</strong>
+                                if (exam.Medications != null && exam.Medications.Any())
+                                {
+                                   for (int j = 0; j < exam.Medications.Count; j++)
+                                    {
+                                        var medication = exam.Medications.ElementAt(j);
+                                        <div class="ml-3 p-2 border rounded bg-white">
+                                            <strong class="text-primary">Ordinal(j + 1) Medication:</strong>
+                                            <div><strong>Name:</strong> medication.Name</div>
+                                            <div><strong>Dose:</strong> medication.Dosage</div>
+                                            <div><strong>Administration Date:</strong> medication.ProductionDate.ToString("yyyy-MM-dd")</div>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <span>No medications assigned</span>
+                                } -->
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <span>No examinations recorded</span>
+                }
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="form-group mt-4">
+                @if (User.IsInRole("Owner") || User.IsInRole("Veterinarian"))
+                {
+
+                    <a asp-controller="MedicalRecord" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>}
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Index
+                </a>
+                @if (User.IsInRole("Owner") || User.IsInRole("Veterinarian"))
+                {
+                    
+                        <form asp-controller="MedicalRecord" asp-action="DeleteConfirmed" asp-route-id="Id" method="post" class="d-inline delete-form">
+                            @Html.AntiForgeryToken()
+                    <button type="button" class="btn btn-danger btn-sm delete-btn" data-id="@Model.Id">
+
+                        <i class="fas fa-trash-alt"></i> Delete
+                    </button>
+                </form>}
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    private string Ordinal(int number)
+    {
+        if (number <= 0) return number.ToString();
+
+        switch (number % 100)
+        {
+            case 11:
+            case 12:
+            case 13:
+                return number + "th";
+        }
+
+        switch (number % 10)
+        {
+            case 1:
+                return number + "st";
+            case 2:
+                return number + "nd";
+            case 3:
+                return number + "rd";
+            default:
+                return number + "th";
+        }
+    }
+}
+@section script {
+    <script>
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', async () => {
+                const swalWithBootstrapButtons = Swal.mixin({
+                    customClass: {
+                        confirmButton: "btn btn-success",
+                        cancelButton: "btn btn-danger"
+                    },
+                    buttonsStyling: false
+                });
+
+                swalWithBootstrapButtons.fire({
+                    title: "Are you sure?",
+                    text: "You won't be able to revert this!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Yes, delete it!",
+                    cancelButtonText: "No, cancel!",
+                    reverseButtons: true
+                }).then(async (result) => {
+                    if (result.isConfirmed) {
+                        const id = button.getAttribute("data-id"); // جلب ID من الزر
+
+                        // جلب التوكين المضاد للهجمات CSRF
+                        const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
+                        const token = tokenInput ? tokenInput.value : '';
+
+                        if (!token) {
+                            Swal.fire("Error!", "Anti-forgery token is missing.", "error");
+                            return;
+                        }
+
+                        // إرسال الطلب
+                        const response = await fetch(`/Dashboard/MedicalRecord/DeleteConfirmed`, {
+                            method: 'POST',
+                            headers: {
+                                "Content-Type": "application/x-www-form-urlencoded",
+                                "RequestVerificationToken": token
+                            },
+                            body: new URLSearchParams({ id: id })
+                        });
+
+                        if (response.ok) {
+                            Swal.fire("Deleted!", "The MedicalRecord has been deleted.", "success")
+                                .then(() => window.location.href = '/Dashboard/MedicalRecord/Index'); // إعادة التوجيه بعد الحذف
+                        } else {
+                            Swal.fire("Error!", "Unable to delete the MedicalRecord.", "error");
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+}

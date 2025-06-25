@@ -1,0 +1,135 @@
+﻿@model VaccineHistoryDetailsVM
+
+@section Header {
+        Vaccine History Details
+}
+
+@section loc {
+        show
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<div class="col-md-12">
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h3 class="card-title">Vaccine History Details</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <!-- Name -->
+                <div class="col-md-6 form-group">
+                    <label for="Name">Name</label>
+                    <input asp-for="Name" class="form-control" id="Name" readonly />
+                </div>
+
+                <!-- Administration Date -->
+                <div class="col-md-6 form-group">
+                    <label for="AdministrationDate">Administration Date</label>
+                    <input asp-for="AdministrationDate" class="form-control" id="AdministrationDate" readonly />
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Veterinarian -->
+                <div class="col-md-6 form-group">
+                    <label for="Veterinarian">Veterinarian</label>
+                    <input asp-for="Veterinarian.FullName" class="form-control" id="Veterinarian" readonly />
+                </div>
+
+                <!-- Animal -->
+                <div class="col-md-6 form-group">
+                    <label for="Animal">Animal</label>
+                    <input asp-for="MedicalRecord.Animal.Name" class="form-control" id="Animal" readonly />
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Vaccine -->
+                <div class="col-md-6 form-group">
+                    <label for="Vaccine">Vaccine</label>
+                    <input asp-for="Vaccine.Name" class="form-control" id="Vaccine" readonly />
+                </div>
+
+                <!-- Farm -->
+                <div class="col-md-6 form-group">
+                    <label for="Farm">Farm</label>
+                    <input asp-for="MedicalRecord.Animal.Farm.Name" class="form-control" id="Farm" readonly />
+                </div>
+            </div>
+
+            <div class="form-group mt-4">
+                <a asp-controller="VaccineHistory" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">
+                    <i class="fas fa-edit"></i> Edit
+                </a>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Index
+                </a>
+                <form asp-controller="VaccineHistory" asp-action="DeleteConfirmed" asp-route-id="@Model.Id" method="post" class="d-inline delete-form">
+                    @Html.AntiForgeryToken()
+                    <button type="button" class="btn btn-danger btn-sm delete-btn" data-id="@Model.Id">
+                        <i class="fas fa-trash-alt"></i> Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section script {
+    <script>
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', async () => {
+                const swalWithBootstrapButtons = Swal.mixin({
+                    customClass: {
+                        confirmButton: "btn btn-success",
+                        cancelButton: "btn btn-danger"
+                    },
+                    buttonsStyling: false
+                });
+
+                swalWithBootstrapButtons.fire({
+                    title: "Are you sure?",
+                    text: "You won't be able to revert this!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Yes, delete it!",
+                    cancelButtonText: "No, cancel!",
+                    reverseButtons: true
+                }).then(async (result) => {
+                    if (result.isConfirmed) {
+                        const id = button.getAttribute("data-id"); 
+
+                        const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
+                        const token = tokenInput ? tokenInput.value : '';
+
+                        if (!token) {
+                            Swal.fire("Error!", "Anti-forgery token is missing.", "error");
+                            return;
+                        }
+
+                        const response = await fetch(`/Dashboard/VaccineHistory/DeleteConfirmed/${id}`, {
+                            method: 'POST',
+                            headers: {
+                                "Content-Type": "application/x-www-form-urlencoded",
+                                "RequestVerificationToken": token
+                            }
+                        });
+
+                        if (response.ok) {
+                            Swal.fire("Deleted!", "The Vaccine History has been deleted.", "success")
+                                .then(() => window.location.href = '/Dashboard/VaccineHistory/Index'); 
+                        } else {
+                            Swal.fire("Error!", "Unable to delete the Vaccine History.", "error");
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+}
