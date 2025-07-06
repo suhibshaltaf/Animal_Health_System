@@ -224,7 +224,7 @@ using System.Security.Claims;
                         var result = await signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, false);
                         if (result.Succeeded)
                         {
-                            if (user.Role == "Admin")
+                            if (user.Role == "Admin" || user.Role == "User")
                             {
                                 return RedirectToAction("Index", "Animal", new { area = "Dashboard" });
                             }
@@ -235,6 +235,10 @@ using System.Security.Claims;
                             else if (user.Role == "Veterinarian")
                             {
                                 return RedirectToAction("Index", "Veterinarian", new { area = "Dashboard" });
+                            }
+                            else if (user.Role == "FarmStaff")
+                            {
+                                return RedirectToAction("Index", "FarmStaff", new { area = "Dashboard" });
                             }
                             else if (user.Role == "FarmStaff")
                             {

@@ -52,6 +52,19 @@ namespace Animal_Health_System.PL
 
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 var app = builder.Build();
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                try
+                {
+                    DbInitializer.SeedAsync(services).GetAwaiter().GetResult();
+                }
+                catch (Exception ex)
+                {
+                    var logger = services.GetRequiredService<ILogger<Program>>();
+                    logger.LogError(ex, "An error occurred during seeding the database.");
+                }
+            }
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {

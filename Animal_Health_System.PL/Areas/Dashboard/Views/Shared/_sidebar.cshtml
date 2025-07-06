@@ -75,7 +75,7 @@
                         <p>Farm</p>
                     </a>
                 </li>
-                @if (User.IsInRole("Owner")|| User.IsInRole("Admin")){
+                @if (User.IsInRole("Owner") || User.IsInRole("Admin")){
                 <li class="nav-item">
                     <a asp-controller="FarmStaff" asp-action="Index" class="nav-link bg-pink">
                         <i class="nav-icon fas fa-users"></i>

@@ -46,7 +46,7 @@ namespace Animal_Health_System.DAL.Data
 
 
             // AnimalHealthHistory -> Animal (Many-to-One)
-          
+
             // Birth -> Pregnancy (Many-to-One)
             modelBuilder.Entity<Birth>()
                 .HasOne(b => b.Pregnancy)  // Birth has one Pregnancy
@@ -133,7 +133,7 @@ namespace Animal_Health_System.DAL.Data
         .OnDelete(DeleteBehavior.Restrict);
 
             // PregnancyNotification -> Animal (Many-to-One)
-         
+
 
             // Owner -> Farm (One-to-Many)
             modelBuilder.Entity<Owner>()
@@ -142,11 +142,11 @@ namespace Animal_Health_System.DAL.Data
                 .HasForeignKey(f => f.OwnerId).OnDelete(DeleteBehavior.Restrict);
 
             // Owner -> Notification (One-to-Many)
-        
-           
+
+
 
             // Notification -> Veterinarian (Many-to-One)
-         
+
 
 
 
@@ -157,7 +157,7 @@ namespace Animal_Health_System.DAL.Data
       .UsingEntity(j => j.ToTable("MedicalExamination_Medication"));
 
             // FarmHealthSummary -> Farm (Many-to-One)
-         
+
             modelBuilder.Entity<Mating>()
         .HasOne(m => m.MaleAnimal)
         .WithMany()
@@ -182,7 +182,7 @@ namespace Animal_Health_System.DAL.Data
                 .HasIndex(a => new { a.FarmId, a.Name })
                 .IsUnique();
 
-          
+
 
             modelBuilder.Entity<Farm>()
                 .HasIndex(f => new { f.Name, f.OwnerId })
@@ -216,7 +216,7 @@ namespace Animal_Health_System.DAL.Data
                .HasIndex(m => m.Name)
                .IsUnique();
 
-         
+
 
             modelBuilder.Entity<Owner>()
                 .HasIndex(o => o.Email)
@@ -240,13 +240,13 @@ namespace Animal_Health_System.DAL.Data
                 .HasIndex(v => v.Email)
                 .IsUnique();
             // ----------soft delet ----------
-           
+
             modelBuilder.Entity<Animal>()
                 .HasQueryFilter(d => !d.IsDeleted);
 
-         
 
-          
+
+
 
             modelBuilder.Entity<Birth>()
                 .HasQueryFilter(d => !d.IsDeleted);
@@ -256,7 +256,7 @@ namespace Animal_Health_System.DAL.Data
             modelBuilder.Entity<Farm>()
                 .HasQueryFilter(d => !d.IsDeleted);
 
-            
+
 
             modelBuilder.Entity<FarmStaff>()
                 .HasQueryFilter(d => !d.IsDeleted);
@@ -277,7 +277,7 @@ namespace Animal_Health_System.DAL.Data
 
 
 
-         
+
 
             modelBuilder.Entity<Owner>()
                 .HasQueryFilter(o => !o.IsDeleted);
@@ -304,121 +304,96 @@ namespace Animal_Health_System.DAL.Data
 
 
 
-          // تعريف المتغيرات للأدوار
+            // تعريف المتغيرات للأدوار
             var roleAdminId = Guid.NewGuid().ToString();
             var ownerRoleId = Guid.NewGuid().ToString();
             var veterinarianRoleId = Guid.NewGuid().ToString();
             var farmStaffRoleId = Guid.NewGuid().ToString();
+            var UserRoleId = Guid.NewGuid().ToString();
 
-            // إضافة الأدوار
             modelBuilder.Entity<IdentityRole>().HasData(
-                new IdentityRole { Id = roleAdminId, Name = "Admin", NormalizedName = "ADMIN" }, // إضافة دور Admin دون ربطه بمستخدم
+                new IdentityRole { Id = roleAdminId, Name = "Admin", NormalizedName = "ADMIN" },
                 new IdentityRole { Id = ownerRoleId, Name = "Owner", NormalizedName = "OWNER" },
                 new IdentityRole { Id = veterinarianRoleId, Name = "Veterinarian", NormalizedName = "VETERINARIAN" },
-                new IdentityRole { Id = farmStaffRoleId, Name = "FarmStaff", NormalizedName = "FARMSTAFF" }
+                new IdentityRole { Id = farmStaffRoleId, Name = "FarmStaff", NormalizedName = "FARMSTAFF" },
+                                new IdentityRole { Id = UserRoleId, Name = "User", NormalizedName = "USER" }
+
             );
 
             var hasher = new PasswordHasher<ApplicationUser>();
 
-            // تعريف مستخدم Admin
             var adminUser = new ApplicationUser
             {
                 Id = Guid.NewGuid().ToString(),
-                UserName = "admin@medc.com",
-                NormalizedUserName = "ADMIN@MEDC.COM",
-                Email = "admin@medc.com",
-                NormalizedEmail = "ADMIN@MEDC.COM",
+                UserName = "Admin",
+                NormalizedUserName = "ADMIN",
+                Email = "admin@animal.com",
+                NormalizedEmail = "ADMIN@ANIMAL.COM",
                 EmailConfirmed = true,
-                Role ="Admin" // تعيين قيمة للـ Role
+                Role = "Admin"
             };
             adminUser.PasswordHash = hasher.HashPassword(adminUser, "Sohaib@18");
-
-            // تعريف مستخدم Owner
+            var user = new ApplicationUser
+            {
+                Id = Guid.NewGuid().ToString(),
+                UserName = "User",
+                NormalizedUserName = "USER",
+                Email = "user@animal.com",
+                NormalizedEmail = "USER@ANIMAL.COM",
+                EmailConfirmed = true,
+                Role = "User"
+            };
+            user.PasswordHash = hasher.HashPassword(user, "Sohaib@18");
             var ownerUser = new ApplicationUser
             {
                 Id = Guid.NewGuid().ToString(),
-                UserName = "owner@medc.com",
-                NormalizedUserName = "OWNER@MEDC.COM",
-                Email = "owner@medc.com",
-                NormalizedEmail = "OWNER@MEDC.COM",
+                UserName = "Owner",
+                NormalizedUserName = "OWNER",
+                Email = "owner@animal.com",
+                NormalizedEmail = "OWNER@ANIMAL.COM",
                 EmailConfirmed = true,
-                Role = "Owner" // تعيين قيمة للـ Role
+                Role = "Owner"
             };
             ownerUser.PasswordHash = hasher.HashPassword(ownerUser, "Sohaib@18");
 
-            // إضافة بيانات الـ Owner إلى جدول Owner
-            var owner = new Owner
-            {
-                Id = 1,
-                FullName = "John Doe",
-                PhoneNumber = "123-456-7890",
-                Email = "owner@medc.com",
-                ApplicationUserId = ownerUser.Id // ربط المستخدم بـ ApplicationUser
-            };
 
-            // تعريف مستخدم Veterinarian
+
             var veterinarianUser = new ApplicationUser
             {
                 Id = Guid.NewGuid().ToString(),
-                UserName = "veterinarian@medc.com",
-                NormalizedUserName = "VETERINARIAN@MEDC.COM",
-                Email = "veterinarian@medc.com",
-                NormalizedEmail = "VETERINARIAN@MEDC.COM",
+                UserName = "Veterinarian",
+                NormalizedUserName = "VETERINARIAN",
+                Email = "veterinarian@animal.com",
+                NormalizedEmail = "VETERINARIAN@ANIMAL.COM",
                 EmailConfirmed = true,
-                Role = "Veterinarian" // تعيين قيمة للـ Role
+                Role = "Veterinarian"
             };
             veterinarianUser.PasswordHash = hasher.HashPassword(veterinarianUser, "Sohaib@18");
 
-            // إضافة بيانات الـ Veterinarian إلى جدول Veterinarian
-            var veterinarian = new Veterinarian
-            {Id=1,
-                FullName = "Dr. Smith",
-                Specialty = "Small Animal",
-                PhoneNumber = "123-456-7890",
-                Email = "veterinarian@medc.com",
-                YearsOfExperience = 5,
-                salary = 50000,
-                ApplicationUserId = veterinarianUser.Id // ربط المستخدم بـ ApplicationUser
-            };
-
-            // تعريف مستخدم FarmStaff
+           
             var farmStaffUser = new ApplicationUser
             {
                 Id = Guid.NewGuid().ToString(),
-                UserName = "farmstaff@medc.com",
-                NormalizedUserName = "FARMSTAFF@MEDC.COM",
-                Email = "farmstaff@medc.com",
-                NormalizedEmail = "FARMSTAFF@MEDC.COM",
+                UserName = "farmstaff",
+                NormalizedUserName = "FARMSTAFF",
+                Email = "farmstaff@animal.com",
+                NormalizedEmail = "FARMSTAFF@ANIMAL.COM",
                 EmailConfirmed = true,
-                Role = "FarmStaff" // تعيين قيمة للـ Role
+                Role = "FarmStaff"
             };
             farmStaffUser.PasswordHash = hasher.HashPassword(farmStaffUser, "Sohaib@18");
 
-            // إضافة بيانات الـ FarmStaff إلى جدول FarmStaff
-         /*  var farmStaff = new FarmStaff
-              {
-                  FullName = "Alex Johnson",
-                  JobTitle = "Farm Worker",
-                  PhoneNumber = "123-456-7890",
-                  Email = "farmstaff@medc.com",
-                  salary = 30000,
-                  FarmId = null, // ربط مع مزرعة معينة
-                  ApplicationUserId = farmStaffUser.Id // ربط المستخدم بـ ApplicationUser
-              };
-            */
-            // إضافة المستخدمين إلى قاعدة البيانات
-            modelBuilder.Entity<ApplicationUser>().HasData(adminUser, ownerUser, veterinarianUser, farmStaffUser);
-            modelBuilder.Entity<Owner>().HasData(owner);
-            modelBuilder.Entity<Veterinarian>().HasData(veterinarian);
-            //  modelBuilder.Entity<FarmStaff>().HasData(farmStaff);
+           
+            modelBuilder.Entity<ApplicationUser>().HasData(adminUser, ownerUser, veterinarianUser, farmStaffUser,user);
+         
 
-            // ربط المستخدمين بالأدوار الصحيحة
             modelBuilder.Entity<IdentityUserRole<string>>().HasData(
                 new IdentityUserRole<string> { RoleId = ownerRoleId, UserId = ownerUser.Id },
                 new IdentityUserRole<string> { RoleId = veterinarianRoleId, UserId = veterinarianUser.Id },
+                 new IdentityUserRole<string> { RoleId = UserRoleId, UserId = user.Id },
                 new IdentityUserRole<string> { RoleId = farmStaffRoleId, UserId = farmStaffUser.Id }
             );
-           
+
         }
 
 
